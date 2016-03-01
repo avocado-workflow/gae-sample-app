@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Application {
 	
-//	@Value("${info.version}")
-	private String version = "1";
+	@Value("${info.version}")
+	private String version;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
