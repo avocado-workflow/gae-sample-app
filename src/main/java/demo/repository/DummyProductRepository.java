@@ -1,6 +1,5 @@
 package demo.repository;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -18,7 +17,7 @@ public class DummyProductRepository implements ProductRepository {
 			Product p = new Product();
 			p.setDescription("fresh apples");
 			p.setName("apple");
-			p.setPrice(new BigDecimal("4.5"));
+			p.setPrice(4.5);
 			p.setSku(UUID.randomUUID().toString());
 			put(p.getSku(), p);
 		}

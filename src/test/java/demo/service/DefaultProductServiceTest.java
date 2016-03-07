@@ -2,6 +2,7 @@ package demo.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import demo.converter.ProductConverter;
+import demo.dto.ProductResource;
 import demo.model.Product;
 import demo.repository.ProductRepository;
 
@@ -23,6 +26,12 @@ public class DefaultProductServiceTest {
 	
 	@Mock
 	private ProductRepository productRepository;
+
+	@Mock
+	private ProductConverter productConverter;
+	
+	@Mock
+	private ProductConverter productResourceConverter;
 	
 	@Test
 	public void testGetBySkuWhenProductExist() throws Exception {
@@ -30,16 +39,20 @@ public class DefaultProductServiceTest {
 		Product product = new Product();
 		product.setName("oranges");
 		when(productRepository.findOne(anyString())).thenReturn(product);
-
+		
+		ProductResource expectedProduct = new ProductResource();
+		expectedProduct.setName("oranges");
+		when(productConverter.convert(any(Product.class))).thenReturn(expectedProduct);
 		// When
-		Product returnedValue = unit.getBySku("12123");
+		ProductResource returnedValue = unit.getBySku("12123");
 		
 		// Then
 		verify(productRepository).findOne("12123");
-		assertEquals(product, returnedValue);
+		verify(productConverter).convert(product);
+		assertEquals(expectedProduct, returnedValue);
 	}
 	
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void testGetBySkuWhenProductDoesntExist() throws Exception {
 		// Given
 		Product product = new Product();
@@ -47,7 +60,7 @@ public class DefaultProductServiceTest {
 		when(productRepository.findOne(anyString())).thenReturn(null);
 		
 		// When
-		Product returnedValue = unit.getBySku("12123");
+		ProductResource returnedValue = unit.getBySku("12123");
 		
 		// Then
 		verify(productRepository).findOne("12123");

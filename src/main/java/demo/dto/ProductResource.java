@@ -1,16 +1,12 @@
-package demo.model;
+package demo.dto;
 
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
+public class ProductResource {
 
-@Entity
-public class Product {
-	@Id
 	private String sku;
 	private String name;
 	private String description;
 	private Double price;
-	// TODO : add image blob byte[]?
+
 	public String getSku() {
 		return sku;
 	}
@@ -62,7 +58,7 @@ public class Product {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Product other = (Product) obj;
+		ProductResource other = (ProductResource) obj;
 		if (description == null) {
 			if (other.description != null)
 				return false;

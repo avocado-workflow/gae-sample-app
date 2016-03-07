@@ -17,6 +17,19 @@
 	</parent>
 
 	<dependencies>
+<!--         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency> 
+        
+  		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.4</version>
+		</dependency>
+        -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -40,6 +53,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
+            <version>${gae.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-api-labs</artifactId>
@@ -63,18 +81,58 @@
 			<artifactId>httpclient</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>com.googlecode.objectify</groupId>
+          <artifactId>objectify</artifactId>
+          <version>${objectify.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.neo4j</groupId>
+        	<artifactId>neo4j-cypher-compiler-2.2</artifactId>
+        	<version>2.2.5</version>
+        </dependency>
+        <dependency>
+        	<groupId>xml-resolver</groupId>
+        	<artifactId>xml-resolver</artifactId>
+        	<version>1.2</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>
+        		spring-boot-starter-cloud-connectors
+        	</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>com.fasterxml.jackson.datatype</groupId>
+        	<artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
 	</dependencies>
 
 	<properties>
+		<app.id>psychic-city-78613</app.id>
+		<app.version>1.0.1</app.version>
 		<start-class>demo.Application</start-class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.7</java.version>
 		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
 		<gae.version>1.9.32</gae.version>
+	    <objectify.version>5.1.5</objectify.version>
+        <guava.version>18.0</guava.version>
+        <gcloud.plugin.version>2.0.9.74.v20150814</gcloud.plugin.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
 	</properties>
 
 	<build>
+        <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
+	
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -91,10 +149,90 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
 			<plugin>
-				<groupId>com.google.appengine</groupId>
-				<artifactId>appengine-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludedGroups>demo.IntegrationTests</excludedGroups>
+				</configuration>
+			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>true</archiveClasses>
+                    <webResources>
+                        <!-- in order to interpolate version from pom into appengine-web.xml -->
+                        <resource>
+                            <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+                            <filtering>true</filtering>
+                            <targetPath>WEB-INF</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
 				<version>${gae.version}</version>
+                <configuration>
+                    <enableJarClasses>false</enableJarClasses>
+                    <version>${app.version}</version>
+                    <!-- Comment in the below snippet to bind to all IPs instead of just localhost -->
+                    <!-- address>0.0.0.0</address>
+                    <port>8080</port -->
+                    <!-- Comment in the below snippet to enable local debugging with a remote debugger
+                         like those included with Eclipse or IntelliJ -->
+                    <!--
+                     <jvmFlags>
+                      <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
+                    </jvmFlags>
+                     -->
+
+				<jvmFlags>
+<!-- 					<jvmFlag>-Ddatastore.backing_store=war/WEB-INF/appengine-generated/local_db.bin</jvmFlag>
+ -->					<jvmFlag>-Ddatastore.backing_store=${project.basedir}/local_db.bin</jvmFlag>
+						<jvmFlag>-Duser.timezone=UTC</jvmFlag>
+                </jvmFlags>
+                </configuration>
+                <executions>
+                <execution><id>preintegration</id>
+                	<phase>pre-integration-test</phase>
+                	<goals><goal>devserver_start</goal></goals>
+                </execution>
+                <execution><id>postintegration</id>
+                	<phase>post-integration-test</phase>
+                	<goals><goal>devserver_stop</goal></goals>
+                </execution>
+                </executions>
+            </plugin>
+            <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>failsafe-it</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+						<configuration>
+							<skip>${skipTests}</skip>
+						    <groups>demo.IntegrationTests</groups>
+							<includes>
+								<include>**/*Test.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
@@ -110,10 +248,19 @@
 					<path>/</path>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.google.appengine</groupId>
+				<artifactId>gcloud-maven-plugin</artifactId>
+				<version>${gcloud.plugin.version}</version>
+				<configuration>
+					<set_default>true</set_default>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
-	<profiles>
+<!-- 
+ 	<profiles>
 		<profile>
 			<id>integration</id>
 			<build>
@@ -158,6 +305,7 @@
 			</build>
 		</profile>
 	</profiles>
+ -->
 
 	<repositories>
 		<repository>

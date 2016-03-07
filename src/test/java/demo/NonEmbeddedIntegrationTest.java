@@ -23,11 +23,13 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.springframework.boot.test.TestRestTemplate;
 
-public class NonEmbeddedIntegrationTests {
+@Category(IntegrationTests.class)
+public class NonEmbeddedIntegrationTest {
 
-	private static final Logger log = Logger.getLogger(NonEmbeddedIntegrationTests.class);
+	private static final Logger log = Logger.getLogger(NonEmbeddedIntegrationTest.class);
 
 	@Rule
 	public ServerRunning serverRunning = ServerRunning.isRunning();

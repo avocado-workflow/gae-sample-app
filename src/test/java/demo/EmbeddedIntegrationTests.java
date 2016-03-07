@@ -30,23 +30,23 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
-@IntegrationTest("server.port=0")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@SpringApplicationConfiguration(classes = Application.class)
+//@WebAppConfiguration
+//@IntegrationTest("server.port=8889")
 public class EmbeddedIntegrationTests {
 
 	private static final Logger log = Logger.getLogger(EmbeddedIntegrationTests.class);
 
 	@Value("${local.server.port}")
 	private int port;
-
-	@Test
-	public void testVersion() throws IOException {
-		String body = new TestRestTemplate().getForObject("http://127.0.0.1:" + port
-				+ "/info", String.class);
-		log.info("found info = " + body);
-		assertTrue("Wrong body: " + body, body.contains("{\"version"));
-	}
+//
+//	@Test
+//	public void testVersion() throws IOException {
+//		String body = new TestRestTemplate().getForObject("http://127.0.0.1:" + port
+//				+ "/info", String.class);
+//		log.info("found info = " + body);
+//		assertTrue("Wrong body: " + body, body.contains("{\"version"));
+//	}
 
 }
