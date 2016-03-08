@@ -115,7 +115,7 @@
 
 	<properties>
 		<app.id>psychic-city-78613</app.id>
-		<app.version>1.0.1</app.version>
+		<app.version>5</app.version>
 		<start-class>demo.Application</start-class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -200,6 +200,7 @@
 				<jvmFlags>
 <!-- 					<jvmFlag>-Ddatastore.backing_store=war/WEB-INF/appengine-generated/local_db.bin</jvmFlag>
  -->					<jvmFlag>-Ddatastore.backing_store=${project.basedir}/local_db.bin</jvmFlag>
+ 						<!-- This doesn't work in cloud -->
 						<jvmFlag>-Duser.timezone=UTC</jvmFlag>
                 </jvmFlags>
                 </configuration>

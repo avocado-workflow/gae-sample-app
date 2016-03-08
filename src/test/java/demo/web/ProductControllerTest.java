@@ -10,15 +10,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.google.apphosting.api.ApiProxy;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.VoidWork;
-import com.googlecode.objectify.Work;
 import com.googlecode.objectify.util.Closeable;
 
 import demo.EmbeddedDataStore;
@@ -29,7 +26,7 @@ import demo.model.Product;
 // @RunWith(SpringJUnit4ClassRunner.class)
 // @SpringApplicationConfiguration(classes = Application.class)
 // @WebIntegrationTest("server.port=8889")
-public class ProductControllerTest {
+public class ProductControllerTest extends BaseIntegrationTest{
 
 	@Rule
 	public EmbeddedDataStore store = new EmbeddedDataStore();
@@ -51,42 +48,28 @@ public class ProductControllerTest {
 		
 		ObjectifyService.register(Product.class);
 //		
-		List<Key<Product>> productsToDelete = ObjectifyService.ofy().load().type(Product.class).keys().list();
-		System.out.println("SIZE1: " + productsToDelete.size());
-//		ObjectifyService.ofy().delete().keys(productsToDelete).now();
-////		ObjectifyService.ofy().delete().type(Product.class).id("0c7cbf98-7c03-44b4-bb8c-867d8aebac83").now();
-////		ObjectifyService.ofy().delete().type(Product.class).id("23d2680c-141f-4220-9444-ab076df3bf58").now();
-////		Product p = ObjectifyService.ofy().load().type(Product.class).id("0c7cbf98-7c03-44b4-bb8c-867d8aebac83").now();
-////		System.out.println(p);
-////		ObjectifyService.ofy().delete().entity(p).now();
+//		System.out.println("SIZE1: " + productsToDelete.size());
+//		System.out.println(ObjectifyService.ofy().load().key(productsToDelete.get(0)).now());
+//		System.out.println(ObjectifyService.ofy().load().key(productsToDelete.get(0)).now());
 //		productsToDelete = ObjectifyService.ofy().load().type(Product.class).keys().list();
-//		System.out.println("SIZE 2: " + productsToDelete.size());
-		
-		ObjectifyService.ofy().transact(new VoidWork() {
-			
-			
-			@Override
-			public void vrun() {
-		Product p = ObjectifyService.ofy().load().type(Product.class).id("0c7cbf98-7c03-44b4-bb8c-867d8aebac83").now();
-		System.out.println(p);
-		ObjectifyService.ofy().delete().entity(p);
-				
-			}
-		});
-		productsToDelete = ObjectifyService.ofy().load().type(Product.class).keys().list();
-		System.out.println("SIZE3: " + productsToDelete.size());
+//		System.out.println("SIZE2: " + productsToDelete.size());
+//		
+//		productsToDelete = ObjectifyService.ofy().load().type(Product.class).keys().list();
+//		System.out.println("SIZE3: " + productsToDelete.size());
 		
 	}
 
 	//
 	@After
 	public void tearDown() {
+		List<Key<Product>> productsToDelete = ObjectifyService.ofy().load().type(Product.class).keys().list();
+		System.out.println(ObjectifyService.ofy().delete().keys(productsToDelete).now());
 		session.close();
 	}
 
 	@Test
 	public void testGetAllProducts() throws Exception {
-		ResponseEntity<Product[]> responseEntity = new TestRestTemplate().getForEntity(baseUrl + "/products",
+		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products",
 				Product[].class);
 
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -103,7 +86,7 @@ public class ProductControllerTest {
 		product.setDescription("Fresh tropic lemons");
 
 		// When
-		ResponseEntity<Product> responseEntity = new TestRestTemplate().postForEntity(baseUrl + "/products", product,
+		ResponseEntity<Product> responseEntity = testRestTemplate.postForEntity(baseUrl + "/products", product,
 				Product.class);
 
 		// Then
@@ -131,7 +114,7 @@ public class ProductControllerTest {
 																	// get it???
 
 		// When
-		Product returnedProduct = new TestRestTemplate().getForObject(baseUrl + "/products/" + skuToFind,
+		Product returnedProduct = testRestTemplate.getForObject(baseUrl + "/products/" + skuToFind,
 				Product.class);
 
 		// Then

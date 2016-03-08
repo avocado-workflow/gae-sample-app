@@ -1,12 +1,14 @@
 package demo.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
 import com.googlecode.objectify.ObjectifyService;
 
 import demo.model.Order;
+import demo.model.OrderItem;
 
 @Repository
 public class GoogleDatastoreOrderRepository implements OrderRepository {
@@ -22,10 +24,18 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 	}
 
 	@Override
-	public Order save(Order order) {  // TODO - wrap with transaction!!!
+	public Order save(Order order) {  // TODO - wrap with transaction?
 		order.setUpdatedOn(new Date());
+		
 		ObjectifyService.ofy().save().entity(order).now();
-		ObjectifyService.ofy().save().entities(order.getOrderItems()).now();
+		
+		List<OrderItem> orderItems = order.getOrderItems();
+		
+		for (OrderItem orderItem : orderItems) {
+			orderItem.setOrder(order);
+		}
+		
+		ObjectifyService.ofy().save().entities(orderItems).now();
 		return order;
 	}
 

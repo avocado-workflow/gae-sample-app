@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.dto.OrderResource;
+import demo.model.Order;
 import demo.service.OrderService;
 
 @RestController
@@ -21,23 +21,23 @@ public class OrderController {
     private OrderService orderService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<OrderResource> products() {
+    public Iterable<Order> orders() {
         return orderService.getAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public OrderResource product(@PathVariable Long id) {
+    public Order order(@PathVariable Long id) {
         return orderService.getById(id);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResource createProduct(@RequestBody OrderResource product) {
+    public Order createOrder(@RequestBody Order product) {
         return orderService.save(product);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public void updateOrder(@PathVariable Long id, @RequestBody OrderResource menu) {
+    public void updateOrder(@PathVariable Long id, @RequestBody Order menu) {
         orderService.update(id, menu);
     }
 }

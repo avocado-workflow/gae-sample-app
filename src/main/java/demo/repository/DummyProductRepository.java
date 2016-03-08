@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import demo.model.Product;
 
-@Repository
+//@Repository
 public class DummyProductRepository implements ProductRepository {
 
 	@SuppressWarnings("serial")

@@ -1,15 +1,15 @@
 package demo.service;
 
-import demo.dto.OrderResource;
+import demo.model.Order;
 
 public interface OrderService {
 
-	Iterable<OrderResource> getAll();
+	Iterable<Order> getAll();
 
-	OrderResource getById(Long id);
+	Order getById(Long id);
 
-	OrderResource save(OrderResource product);
+	Order save(Order product);
 
-	void update(Long id, OrderResource menu);
+	void update(Long id, Order menu);
 
 }

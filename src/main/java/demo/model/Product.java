@@ -1,15 +1,21 @@
 package demo.model;
 
+import java.io.Serializable;
+
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
 @Entity
-public class Product {
+public class Product implements Serializable {
+	
+	private static final long serialVersionUID = 7207486889933893760L;
+
 	@Id
 	private String sku;
 	private String name;
 	private String description;
 	private Double price;
+
 	// TODO : add image blob byte[]?
 	public String getSku() {
 		return sku;

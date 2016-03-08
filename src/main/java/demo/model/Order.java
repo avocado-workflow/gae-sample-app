@@ -5,13 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
-import com.googlecode.objectify.annotation.OnSave;
+import com.googlecode.objectify.annotation.OnLoad;
 
 @Entity
 public class Order {
@@ -28,9 +26,16 @@ public class Order {
 
 	@Ignore
 	private List<OrderItem> items = new ArrayList<OrderItem>();
-//	 @Load
-//	 private List<Ref<OrderItem>> items = new ArrayList<Ref<OrderItem>>();
+	
+//	@Load
+//	private List<Ref<OrderItem>> itemRefs = new ArrayList<Ref<OrderItem>>();
 
+	@OnLoad
+	private void updateItemsInternal() {
+		items = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(this).list();
+		// TODO : or iterate over itemRefs and populate items with ref.get ?
+//		order.setOrderItems(orderItems);
+	}
 	public Long getId() {
 		return id;
 	}
@@ -60,9 +65,6 @@ public class Order {
 	}
 
 	public List<OrderItem> getOrderItems() {
-		if (items == null) {
-			items = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(this).list();
-		}
 		return items;
 	}
 

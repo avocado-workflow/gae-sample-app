@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import demo.dto.ProductResource;
+import demo.model.Product;
 import demo.service.ProductService;
 
 @RestController
@@ -21,23 +21,23 @@ public class ProductController {
     private ProductService productService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Iterable<ProductResource> products() {
+    public Iterable<Product> products() {
         return productService.getAll();
     }
 
     @RequestMapping(value = "/{sku}", method = RequestMethod.GET)
-    public ProductResource product(@PathVariable String sku) {
+    public Product product(@PathVariable String sku) {
         return productService.getBySku(sku);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductResource createProduct( @RequestBody ProductResource product) {
+    public Product createProduct( @RequestBody Product product) {
         return productService.save(product);
     }
 
     @RequestMapping(value = "/{sku}", method = RequestMethod.PUT)
-    public void updateProduct(@PathVariable String sku, @RequestBody ProductResource menu) {
+    public void updateProduct(@PathVariable String sku, @RequestBody Product menu) {
         productService.update(sku, menu);
     }
 }

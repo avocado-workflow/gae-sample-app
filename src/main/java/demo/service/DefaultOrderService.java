@@ -1,15 +1,17 @@
 package demo.service;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
-import demo.converter.OrderConverter;
-import demo.converter.OrderResourceConverter;
-import demo.dto.OrderResource;
+import demo.exception.RequestValidationException;
 import demo.model.Order;
+import demo.model.OrderItem;
+import demo.model.Product;
 import demo.repository.OrderRepository;
+import demo.repository.ProductRepository;
 
 @Service
 public class DefaultOrderService implements OrderService {
@@ -17,37 +19,47 @@ public class DefaultOrderService implements OrderService {
 	@Resource
 	private OrderRepository orderRepository;
 
-	@Resource
-	private OrderConverter orderConverter;
+	@Resource(name = "googleDatastoreProductRepository")
+	private ProductRepository productRepository;
 
-	@Resource
-	private OrderResourceConverter orderResourceConverter;
-	
 	@Override
-	public Iterable<OrderResource> getAll() {
-		Iterable<Order> orders = orderRepository.findAll();
-		return orderConverter.convertAll(orders);
+	public Iterable<Order> getAll() {
+		return orderRepository.findAll();
 	}
 
 	@Override
-	public OrderResource getById(Long id) {
-		Order order = orderRepository.findOne(id);
-		Assert.notNull(order);
-		return orderConverter.convert(order);
+	public Order getById(Long id) {
+		return orderRepository.findOne(id);
 	}
 
 	@Override
-	public OrderResource save(OrderResource orderResource) {
-		Order order = orderResourceConverter.convert(orderResource);
-		Order savedOrder = orderRepository.save(order);
-		return orderConverter.convert(savedOrder);
+	public Order save(Order order) {
+		validateOrder(order);
+
+		return orderRepository.save(order);
 	}
 
 	@Override
-	public void update(Long id, OrderResource orderResource) {
-		orderResource.setId(id);
-		Order order = orderResourceConverter.convert(orderResource);
+	public void update(Long id, Order order) {
+		order.setId(id);
 		orderRepository.save(order);
 	}
 
+	// TODO : move to separate validator.
+	private void validateOrder(Order order) {
+		List<OrderItem> orderItems = order.getOrderItems();
+		for (OrderItem orderItem : orderItems) {
+			double orderPrice = orderItem.getPrice();
+			Product product = productRepository.findOne(orderItem.getProduct().getSku());
+			if (product == null) {
+				throw new RequestValidationException("Specified product: " + orderItem.getProduct().getSku() + " doesn't exist");
+			}
+			
+			double productPrice = product.getPrice();
+	
+			if (orderPrice < productPrice) {
+				throw new RequestValidationException("Order price " + orderPrice + " is below product price" + productPrice);
+			}
+		}
+	}
 }

@@ -28,7 +28,7 @@ public class EmbeddedDataStore extends ExternalResource {
 //			e.printStackTrace();
 //		}
 		helper.setEnvAppId("psychic-city-78613");
-		helper.setEnvVersionId("1.0.1");
+		helper.setEnvVersionId("5");
 	}
 
 	@Override

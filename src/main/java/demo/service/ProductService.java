@@ -1,14 +1,14 @@
 package demo.service;
 
-import demo.dto.ProductResource;
+import demo.model.Product;
 
 public interface ProductService {
 
-	Iterable<ProductResource> getAll();
+	Iterable<Product> getAll();
 
-	ProductResource getBySku(String sku);
+	Product getBySku(String sku);
 
-	ProductResource save(ProductResource product);
+	Product save(Product product);
 
-	void update(String sku, ProductResource product);
+	void update(String sku, Product product);
 }
