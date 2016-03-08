@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.OnSave;
 
 @Entity
 public class Order {
@@ -21,9 +26,10 @@ public class Order {
 
 	private Address address;
 
+	@Ignore
 	private List<OrderItem> items = new ArrayList<OrderItem>();
-	// @Load
-	// private List<Ref<OrderItem>> items = new ArrayList<Ref<OrderItem>>();
+//	 @Load
+//	 private List<Ref<OrderItem>> items = new ArrayList<Ref<OrderItem>>();
 
 	public Long getId() {
 		return id;
@@ -54,19 +60,17 @@ public class Order {
 	}
 
 	public List<OrderItem> getOrderItems() {
-		List<OrderItem> itemsToReturn = this.items;// ArrayList<>();
-		//
-		// for(Ref<OrderItem> item: this.items) {
-		// itemsToReturn.add(item.get());
-		// }
-
-		return itemsToReturn;
+		if (items == null) {
+			items = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(this).list();
+		}
+		return items;
 	}
 
 	public void setOrderItems(List<OrderItem> items) {
-		this.items = items;// new ArrayList<>();
-		// for(OrderItem item: items) {
-		//// item.setOrder(this);
+		this.items = items;
+		// new ArrayList<>();
+		// for (OrderItem item : items) {
+		// // item.setOrder(this);
 		// this.items.add(Ref.create(item));
 		// }
 	}

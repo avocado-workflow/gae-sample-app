@@ -24,8 +24,8 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 	@Override
 	public Order save(Order order) {  // TODO - wrap with transaction!!!
 		order.setUpdatedOn(new Date());
-		ObjectifyService.ofy().save().entities(order.getOrderItems()).now();
 		ObjectifyService.ofy().save().entity(order).now();
+		ObjectifyService.ofy().save().entities(order.getOrderItems()).now();
 		return order;
 	}
 

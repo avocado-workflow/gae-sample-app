@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Configuration
@@ -34,13 +35,10 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 		MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
-		// objectMapper.setPropertyNamingStrategy(new
-		// PropertyNamingStrategy.PascalCaseStrategy());
+		objectMapper.setPropertyNamingStrategy(new PropertyNamingStrategy.PascalCaseStrategy());
 		jsonConverter.setObjectMapper(objectMapper);
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-//		objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		objectMapper.setDateFormat(df);
-//		objectMapper.registerModule(new JodaModule());
 		objectMapper.disable(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS);
 		return jsonConverter;
 	}
