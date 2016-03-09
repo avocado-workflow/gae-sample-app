@@ -45,6 +45,11 @@ public class DefaultOrderService implements OrderService {
 		orderRepository.save(order);
 	}
 
+	@Override
+	public void delete(Long id) {
+		orderRepository.delete(id);
+	}
+	
 	// TODO : move to separate validator.
 	private void validateOrder(Order order) {
 		List<OrderItem> orderItems = order.getOrderItems();

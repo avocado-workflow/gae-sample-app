@@ -40,4 +40,10 @@ public class OrderController {
     public void updateOrder(@PathVariable Long id, @RequestBody Order menu) {
         orderService.update(id, menu);
     }
+    
+    @RequestMapping(value = "/{sku}", method = RequestMethod.DELETE)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteOrder(@PathVariable Long id) {
+    	orderService.delete(id);
+	}
 }

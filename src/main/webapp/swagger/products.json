@@ -1,0 +1,183 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Product Service"
+    },
+    "host": "psychic-city-78613.appspot.com",
+    "tags": [
+        {
+            "name": "Product",
+            "description": "Product Management"
+        }
+    ],
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "basePath": "/",
+    "paths": {
+        "/products": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "description": "Get all existing products",
+                "operationId": "getProducts", 
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "description": "Create Product",
+                "operationId": "createProduct",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "product",
+                        "description": "Product JSON",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "Name",
+                                "Price"
+                            ],
+                            "properties": {
+                                "Name": {
+                                    "type": "string",
+                                    "description": "Product Name"
+                                },
+                                "Description": {
+                                    "type": "string",
+                                    "description": "Product Description"
+                                },
+                                "Price": {
+                                    "type": "double",
+                                    "description": "Product price"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK. Created."
+                    }
+                }
+            }
+        },
+        "/products/{productSku}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "description": "Get  Product By its SKU",
+                "operationId": "getProductBySku",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "productSku",
+                        "description": "Product Sku Code",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Product with specified SKU not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Product"
+                ],
+                "description": "Update product",
+                "operationId": "updateProduct",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "productSku",
+                        "description": "Product Sku Code",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "product",
+                        "description": "Product JSON",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "Sku",
+                                "Name",
+                                "Price"
+                            ],
+                            "properties": {
+                                "Sku": {
+                                    "type":"string",
+                                    "description": "SKU code"
+                                },
+                                "Name": {
+                                    "type": "string",
+                                    "description": "Product Name"
+                                },
+                                "Description": {
+                                    "type": "string",
+                                    "description": "Product Description"
+                                },
+                                "Price": {
+                                    "type": "double",
+                                    "description": "Product price"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "description": "Delete  Product By SKU",
+                "operationId": "deleteProductBySku",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "productSku",
+                        "description": "Product Sku Code",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Product deleted successfully"
+                    }
+                }
+            }
+        }
+    }
+}

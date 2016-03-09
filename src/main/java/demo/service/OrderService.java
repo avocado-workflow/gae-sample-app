@@ -8,8 +8,9 @@ public interface OrderService {
 
 	Order getById(Long id);
 
-	Order save(Order product);
+	Order save(Order order);
 
-	void update(Long id, Order menu);
+	void update(Long id, Order order);
 
+	void delete(Long id);
 }
