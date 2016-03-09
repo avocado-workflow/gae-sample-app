@@ -20,7 +20,12 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 
 	@Override
 	public Order findOne(Long id) {
-		return ObjectifyService.ofy().load().type(Order.class).id(id).now();
+		Order order = ObjectifyService.ofy().load().type(Order.class).id(id).now();
+		
+		List<OrderItem> orderItems = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(order).list();
+		order.setOrderItems(orderItems);
+		
+		return order;
 	}
 
 	@Override

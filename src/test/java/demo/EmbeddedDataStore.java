@@ -13,7 +13,8 @@ public class EmbeddedDataStore extends ExternalResource {
 
 		localDatastoreServiceTestConfig.setBackingStoreLocation("local_db.bin");
 		localDatastoreServiceTestConfig.setNoStorage(false);
-
+		localDatastoreServiceTestConfig.setApplyAllHighRepJobPolicy();
+			
 		helper = new LocalServiceTestHelper(localDatastoreServiceTestConfig);
 //		String xml;
 //		try {
@@ -28,12 +29,13 @@ public class EmbeddedDataStore extends ExternalResource {
 //			e.printStackTrace();
 //		}
 		helper.setEnvAppId("psychic-city-78613");
-		helper.setEnvVersionId("5");
+		helper.setEnvVersionId("7");
+		helper.setEnvAuthDomain("gmail.com");
 	}
 
 	@Override
 	protected void before() throws Throwable {
-
+System.out.println("SETUP");
 		// ,
 		// new LocalBlobstoreServiceTestConfig(),
 		// new LocalTaskQueueTestConfig(),
@@ -44,6 +46,7 @@ public class EmbeddedDataStore extends ExternalResource {
 
 	@Override
 	protected void after() {
+		System.out.println("TEARDOWN");
 		helper.tearDown();
 	}
 }

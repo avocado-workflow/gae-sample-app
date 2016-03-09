@@ -23,4 +23,9 @@ public class BasicCacheImpl implements Cache {
 		}
 		return null;
 	}
+
+	@Override
+	public void remove(Object key) {
+		cache.delete(key);
+	}
 }

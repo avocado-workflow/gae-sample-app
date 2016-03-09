@@ -9,4 +9,8 @@ public interface ProductRepository {
 	Product findOne(String sku);
 
 	Product save(Product product);
+
+	void deleteBySku(String sku);
+
+	void update(Product product);
 }

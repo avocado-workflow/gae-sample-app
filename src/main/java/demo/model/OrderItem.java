@@ -15,7 +15,7 @@ public class OrderItem {
 	@Parent
 	private Key<Order> order;
 
-	@Load(Product.class)
+	@Load
 	private Ref<Product> product;
 
 	private int qty;

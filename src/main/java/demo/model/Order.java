@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.OnLoad;
 
 @Entity
 public class Order {
@@ -26,16 +24,7 @@ public class Order {
 
 	@Ignore
 	private List<OrderItem> items = new ArrayList<OrderItem>();
-	
-//	@Load
-//	private List<Ref<OrderItem>> itemRefs = new ArrayList<Ref<OrderItem>>();
 
-	@OnLoad
-	private void updateItemsInternal() {
-		items = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(this).list();
-		// TODO : or iterate over itemRefs and populate items with ref.get ?
-//		order.setOrderItems(orderItems);
-	}
 	public Long getId() {
 		return id;
 	}
@@ -70,11 +59,6 @@ public class Order {
 
 	public void setOrderItems(List<OrderItem> items) {
 		this.items = items;
-		// new ArrayList<>();
-		// for (OrderItem item : items) {
-		// // item.setOrder(this);
-		// this.items.add(Ref.create(item));
-		// }
 	}
 
 	@Override
@@ -116,8 +100,8 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "Order [id=" + id + ", createdOn=" + createdOn + ", updatedOn=" + updatedOn + ", address=" + address
-				+ ", items=" + items + "]";
+		return "Order [id=" + id + ", createdOn=" + createdOn + ", updatedOn=" + updatedOn + ", address=" + address + ", items=" + items
+				+ "]";
 	}
 
 }

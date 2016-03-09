@@ -31,6 +31,12 @@ public class DefaultProductService implements ProductService {
 	@Override
 	public void update(String sku, Product product) {
 		product.setSku(sku);
-		productRepository.save(product);
+		productRepository.update(product);
 	}
+
+	@Override
+	public void deleteProduct(String sku) {
+		productRepository.deleteBySku(sku);
+	}
+	
 }

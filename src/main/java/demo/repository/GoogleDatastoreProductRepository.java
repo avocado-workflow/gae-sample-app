@@ -17,12 +17,13 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 	private Cache cache;
 
 	@Override
-	public Iterable<Product> findAll() {
+	public Iterable<Product> findAll() {ObjectifyService.ofy().clear();
 		return ObjectifyService.ofy().load().type(Product.class).list();
 	}
 
 	@Override
 	public Product findOne(String sku) {
+//		return ObjectifyService.ofy().load().type(Product.class).id(sku).now();
 		Product product = cache.get(sku, Product.class);
 		if (product == null) {
 			product = ObjectifyService.ofy().load().type(Product.class).id(sku).now();
@@ -37,6 +38,19 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 	public Product save(Product product) {
 		product.setSku(UUID.randomUUID().toString());
 		ObjectifyService.ofy().save().entity(product).now();
+		cache.put(product.getSku(), product);
 		return product;
+	}
+
+	@Override
+	public void deleteBySku(String sku) {
+		cache.remove(sku);
+		ObjectifyService.ofy().delete().type(Product.class).id(sku).now();
+	}
+
+	@Override
+	public void update(Product product) {
+		ObjectifyService.ofy().save().entity(product).now();
+		cache.put(product.getSku(), product);
 	}
 }

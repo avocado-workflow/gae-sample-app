@@ -111,11 +111,16 @@
         	<groupId>com.fasterxml.jackson.datatype</groupId>
         	<artifactId>jackson-datatype-joda</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>commons-httpclient</groupId>
+        	<artifactId>commons-httpclient</artifactId>
+        	<version>3.1</version>
+        </dependency>
 	</dependencies>
 
 	<properties>
 		<app.id>psychic-city-78613</app.id>
-		<app.version>5</app.version>
+		<app.version>7</app.version>
 		<start-class>demo.Application</start-class>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -193,7 +198,6 @@
                          like those included with Eclipse or IntelliJ -->
                     <!--
                      <jvmFlags>
-                      <jvmFlag>-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n</jvmFlag>
                     </jvmFlags>
                      -->
 
@@ -201,6 +205,7 @@
 <!-- 					<jvmFlag>-Ddatastore.backing_store=war/WEB-INF/appengine-generated/local_db.bin</jvmFlag>
  -->					<jvmFlag>-Ddatastore.backing_store=${project.basedir}/local_db.bin</jvmFlag>
  						<!-- This doesn't work in cloud -->
+						<jvmFlag>-agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=n</jvmFlag>
 						<jvmFlag>-Duser.timezone=UTC</jvmFlag>
                 </jvmFlags>
                 </configuration>

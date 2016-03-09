@@ -3,6 +3,7 @@ package demo.web;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.util.Closeable;
 
 import demo.EmbeddedDataStore;
 import demo.IntegrationTests;
@@ -29,19 +29,20 @@ import demo.model.Product;
 public class OrderControllerTest extends BaseIntegrationTest {
 
 	@Rule
-	public EmbeddedDataStore store = new EmbeddedDataStore();
-
+	public EmbeddedDataStore embeddedDataStore = new EmbeddedDataStore();
+	
 	private int port = 8080;
 
 	private String baseUrl = "http://localhost:" + port;
 
-	Closeable session;
-
 	private Product product1;
 	private Product product2;
 
+	Closeable session;
+
 	@Before
 	public void setUp() {
+
 		session = ObjectifyService.begin();
 
 		ObjectifyService.register(Product.class);
@@ -54,19 +55,29 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		product1.setName("IT product 1");
 		product1.setSku(UUID.randomUUID().toString());
 
+		ResponseEntity<Product> responseEntity = testRestTemplate.postForEntity(baseUrl + "/products", product1, Product.class);
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+
+		product1 = responseEntity.getBody();
+
 		product2 = new Product();
 		product2.setDescription("Int test product 2 description");
 		product2.setName("IT product 2");
 		product2.setPrice(10.5);
 		product2.setSku(UUID.randomUUID().toString());
-		ObjectifyService.ofy().save().entities(product1, product2).now();
-		System.out.println("SKU1" + product1.getSku());
+
+		responseEntity = testRestTemplate.postForEntity(baseUrl + "/products", product2, Product.class);
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+
+		product2 = responseEntity.getBody();
 	}
 
 	//
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
 		session.close();
+		testRestTemplate.delete(baseUrl + "/products/" + product1.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + product2.getSku());
 	}
 
 	@Test
@@ -85,7 +96,6 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		Product product1 = new Product();
 		product1.setSku(this.product1.getSku());
 		orderItem1.setProduct(product1);
-		System.out.println("SKU11" + this.product1.getSku());
 
 		order.setOrderItems(Arrays.asList(orderItem1));
 
@@ -95,9 +105,8 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		// Then
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 
-		
 		Order savedOrder = responseEntity.getBody();
-		
+
 		List<OrderItem> savedOrderItems = savedOrder.getOrderItems();
 		assertNotNull(savedOrderItems);
 		OrderItem savedOrderItem = savedOrderItems.get(0);
@@ -122,7 +131,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		order.setAddress(address);
 
 		OrderItem orderItem1 = new OrderItem();
-		orderItem1.setPrice(product1.getPrice()-0.11);
+		orderItem1.setPrice(product1.getPrice() - 0.11);
 		orderItem1.setQty(6);
 		Product product1 = new Product();
 		product1.setSku(this.product1.getSku());
