@@ -23,8 +23,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE")
-				.allowedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods").allowCredentials(true);
+		registry.addMapping("/**")
+			.allowedOrigins("*")
+			.allowedMethods("GET", "POST", "PUT", "DELETE")
+			//	.allowedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods")
+				.allowCredentials(true);
 	}
 
 	@Bean
