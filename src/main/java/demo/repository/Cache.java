@@ -1,10 +1,10 @@
 package demo.repository;
 
-public interface Cache {
+public interface Cache<V> {
 
-	void put(Object key, Object val);
+	void put(String key, V val);
 	
-	<T> T get(Object key, Class<T> type);
+	V get(String key, Class<V> type);
 
-	void remove(Object key);
+	void remove(String key);
 }
