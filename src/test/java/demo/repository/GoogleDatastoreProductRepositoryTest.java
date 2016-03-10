@@ -1,6 +1,7 @@
 package demo.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.util.Closeable;
@@ -22,13 +24,15 @@ public class GoogleDatastoreProductRepositoryTest {
 
 	private Closeable session;
 
-	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
+			new LocalDatastoreServiceTestConfig(),
+			new LocalMemcacheServiceTestConfig());
 
 	@InjectMocks
 	private GoogleDatastoreProductRepository unit = new GoogleDatastoreProductRepository();
 
 	@Mock
-	private Cache cache;
+	private Cache<Product> cache;
 	
 	@Before
 	public void setUp() {
@@ -67,9 +71,11 @@ public class GoogleDatastoreProductRepositoryTest {
 		unit.update(productToUpdate);
 		
 		// Then
-		Product productFromDatastore = ObjectifyService.ofy().load().type(Product.class).id(sku).now();
-		
-		assertEquals(productToUpdate, productFromDatastore);		
+		verify(cache).put(sku, productToUpdate);
+
+//		Product productFromDatastore = ObjectifyService.ofy().load().type(Product.class).id(sku).now();
+//		
+//		assertEquals(productToUpdate, productFromDatastore);		
 	}
 }
 

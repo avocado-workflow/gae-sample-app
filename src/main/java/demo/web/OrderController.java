@@ -1,8 +1,11 @@
 package demo.web;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,13 +35,19 @@ public class OrderController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Order createOrder(@RequestBody Order product) {
-        return orderService.save(product);
+    public ResponseEntity<Order> createOrder(@RequestBody Order product, HttpServletRequest request) {
+    	Order savedOrder = orderService.save(product);
+    	
+    	ResponseEntity<Order> response = new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
+    	
+    	response.getHeaders().add(HttpHeaders.LOCATION, request.getRequestURL().append("/").append(savedOrder.getId()).toString());
+		
+    	return response;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public void updateOrder(@PathVariable Long id, @RequestBody Order menu) {
-        orderService.update(id, menu);
+    public void updateOrder(@PathVariable Long id, @RequestBody Order order) {
+        orderService.update(id, order);
     }
     
     @RequestMapping(value = "/{sku}", method = RequestMethod.DELETE)

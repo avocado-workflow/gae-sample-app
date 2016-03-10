@@ -35,7 +35,6 @@ public class EmbeddedDataStore extends ExternalResource {
 
 	@Override
 	protected void before() throws Throwable {
-System.out.println("SETUP");
 		// ,
 		// new LocalBlobstoreServiceTestConfig(),
 		// new LocalTaskQueueTestConfig(),
@@ -46,7 +45,6 @@ System.out.println("SETUP");
 
 	@Override
 	protected void after() {
-		System.out.println("TEARDOWN");
 		helper.tearDown();
 	}
 }

@@ -41,6 +41,7 @@ public class DefaultOrderService implements OrderService {
 
 	@Override
 	public void update(Long id, Order order) {
+		// TODO : add validation also!
 		order.setId(id);
 		orderRepository.save(order);
 	}
