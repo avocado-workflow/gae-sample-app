@@ -125,15 +125,10 @@
                         "schema": {
                             "type": "object",
                             "required": [
-                                "Sku",
                                 "Name",
                                 "Price"
                             ],
                             "properties": {
-                                "Sku": {
-                                    "type":"string",
-                                    "description": "SKU code"
-                                },
                                 "Name": {
                                     "type": "string",
                                     "description": "Product Name"

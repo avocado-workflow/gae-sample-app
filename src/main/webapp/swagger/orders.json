@@ -1,0 +1,207 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Product Service"
+    },
+    "host": "psychic-city-78613.appspot.com",
+    "tags": [
+        {
+            "name": "Order",
+            "description": "Order Management"
+        }
+    ],
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "basePath": "/",
+    "paths": {
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Order"
+                ],
+                "description": "Get all existing orders",
+                "operationId": "getOrders", 
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Order"
+                ],
+                "description": "Create new Order",
+                "operationId": "createOrder",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "order",
+                        "description": "Order JSON",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/orderSchema"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "OK. Created."
+                    }
+                }
+            }
+        },
+        "/orders/{orderId}": {
+            "get": {
+                "tags": [
+                    "Order"
+                ],
+                "description": "Get Order By id",
+                "operationId": "getOrderById",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "orderId",
+                        "description": "Order Id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "404": {
+                        "description": "Order with specified id not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Order"
+                ],
+                "description": "Update order",
+                "operationId": "updateOrder",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "orderId",
+                        "description": "Order Id",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "in": "body",
+                        "name": "order",
+                        "description": "Product JSON",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/orderSchema"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            
+            "delete": {
+                "tags": [
+                    "Order"
+                ],
+                "description": "Delete Order By Id",
+                "operationId": "deleteOrderBySku",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "orderId",
+                        "description": "Order Id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Order deleted successfully"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "orderSchema" : {
+            "type": "object",
+            "required": [
+                "Address",
+                "OrderItems"
+            ],
+            "properties": {
+                "Address": {
+                    "type": "object",
+                    "required": [
+                        "Line1",
+                        "ZipCode"
+                    ],
+                    "properties": {
+                        "Line1": {
+                           "type": "string",
+                            "description": "Address line 1"
+                        },
+                        "Line2": {
+                           "type": "string",
+                            "description": "Address line 2"
+                        },
+                        "ZipCode": {
+                           "type": "string",
+                            "description": "Zip Code"
+                        }
+                    }
+                },
+                "OrderItems": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "Price",
+                            "Qty",
+                            "Product"
+                        ],
+                        "properties": {
+                            "Product": {
+                                "type": "object",
+                                "required": [
+                                    "Sku"
+                                ],
+                                "properties": {
+                                    "Sku" : {
+                                        "type": "string",
+                                        "description" : "Product Sku code"
+                                    }
+                                }
+                            }, 
+                            "Price": {
+                                "type": "number",
+                                "description": "Price"
+                            },
+                            "Qty": {
+                                "type": "integer",
+                                "description": "Number of items"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
