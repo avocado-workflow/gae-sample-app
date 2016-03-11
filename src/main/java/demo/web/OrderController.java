@@ -2,6 +2,7 @@ package demo.web;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,14 +36,9 @@ public class OrderController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Order> createOrder(@RequestBody Order product, HttpServletRequest request) {
-    	Order savedOrder = orderService.save(product);
-    	
-    	ResponseEntity<Order> response = new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
-    	
-    	response.getHeaders().add(HttpHeaders.LOCATION, request.getRequestURL().append("/").append(savedOrder.getId()).toString());
-		
-    	return response;
+    public void createOrder(@RequestBody Order order, HttpServletRequest request, HttpServletResponse response) {
+    	orderService.save(order);
+    	response.addHeader(HttpHeaders.LOCATION, request.getRequestURL().append("/").append(order.getId()).toString());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)

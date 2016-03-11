@@ -8,7 +8,7 @@ public interface OrderRepository {
 
 	Order findOne(Long id);
 
-	Order save(Order order);
+	Long save(Order order);
 
 	void delete(Long id);
 }

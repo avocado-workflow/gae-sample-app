@@ -2,7 +2,6 @@ package demo.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -15,6 +14,7 @@ import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.util.Closeable;
 
@@ -89,15 +89,59 @@ public class GoogleDatastoreOrderRepositoryTest {
 
 		order.setOrderItems(Arrays.asList(orderItem1));
 
-		Order savedOrder = unit.save(order);
+		Long orderId = unit.save(order);
 
 		Date creationTimeUpperBound = new Date();
 
-		assertNotNull(savedOrder.getId());
+		assertNotNull(orderId);
 
-		Order orderFromDatastore = unit.findOne(savedOrder.getId());
+		Order savedOrder = ObjectifyService.ofy().load().key(Key.<Order>create(Order.class, orderId)).now();
+		
+		List<OrderItem> orderItemsFromDatastore = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(savedOrder).list();
+		assertNotNull(orderItemsFromDatastore);
 
-		List<OrderItem> orderItemsFromDatastore = orderFromDatastore.getOrderItems();
+		OrderItem orderItemFromDatastore = orderItemsFromDatastore.get(0);
+		assertNotNull(orderItemFromDatastore.getId());
+		assertNotNull(orderItemFromDatastore.getOrder());
+		assertEquals(4, orderItemFromDatastore.getQty());
+		assertEquals(6.8, orderItemFromDatastore.getPrice(), 0.0001);
+		assertEquals(product.getSku(), orderItemFromDatastore.getProductSku());
+
+		assertNotNull(savedOrder);
+
+		assertEquals(address, savedOrder.getAddress());
+
+		assertNotNull(savedOrder.getCreatedOn());
+		assertTrue(savedOrder.getCreatedOn().after(creationTimeLowerBound));
+		assertTrue(savedOrder.getCreatedOn().before(creationTimeUpperBound));
+	}
+
+	@Test
+	public void testGetById() {
+		
+		Order order = new Order();
+		order.setUpdatedOn(new Date());
+
+		Address address = new Address();
+		address.setLine1("4823, james long str.");
+		address.setLine2("NY, USA");
+		address.setZipCode("10010");
+		order.setAddress(address);
+
+		OrderItem orderItem1 = new OrderItem();
+		orderItem1.setPrice(6.8);
+		orderItem1.setQty(4);
+		Product product = new Product();
+		product.setSku(product1.getSku());
+		orderItem1.setProduct(product);
+
+		order.setOrderItems(Arrays.asList(orderItem1));
+		storeOrderInDB(order);
+		
+		assertNotNull(order.getId());
+		Order actualOrder = unit.findOne(order.getId());
+
+		List<OrderItem> orderItemsFromDatastore = actualOrder.getOrderItems();
 		assertNotNull(orderItemsFromDatastore);
 		OrderItem orderItemFromDatastore = orderItemsFromDatastore.get(0);
 		assertNotNull(orderItemFromDatastore.getId());
@@ -106,13 +150,23 @@ public class GoogleDatastoreOrderRepositoryTest {
 		assertEquals(6.8, orderItemFromDatastore.getPrice(), 0.0001);
 		assertEquals(product1, orderItemFromDatastore.getProduct());
 
-		assertNotNull(orderFromDatastore);
+		assertNotNull(actualOrder);
 
-		assertEquals(address, orderFromDatastore.getAddress());
+		assertEquals(address, actualOrder.getAddress());
 
-		assertNotNull(orderFromDatastore.getCreatedOn());
-		assertTrue(orderFromDatastore.getCreatedOn().after(creationTimeLowerBound));
-		assertTrue(orderFromDatastore.getCreatedOn().before(creationTimeUpperBound));
+		assertNotNull(actualOrder.getCreatedOn());
+	}
 
+	private Order storeOrderInDB(Order order) {
+		ObjectifyService.ofy().save().entity(order).now();
+
+		List<OrderItem> orderItems = order.getOrderItems();
+
+		for (OrderItem orderItem : orderItems) {
+			orderItem.setOrder(order);
+		}
+
+		ObjectifyService.ofy().save().entities(orderItems).now();
+		return order;
 	}
 }

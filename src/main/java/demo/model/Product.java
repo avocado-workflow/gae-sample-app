@@ -18,6 +18,7 @@ public class Product implements Serializable {
 	private Double price;
 
 	// TODO : add image blob byte[]?
+	
 	public String getSku() {
 		return sku;
 	}

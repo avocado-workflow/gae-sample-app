@@ -8,7 +8,7 @@ public interface OrderService {
 
 	Order getById(Long id);
 
-	Order save(Order order);
+	Long save(Order order);
 
 	void update(Long id, Order order);
 

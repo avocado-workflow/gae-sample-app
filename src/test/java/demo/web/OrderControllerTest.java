@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.Closeable;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -91,7 +93,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		order.setAddress(address);
 
 		OrderItem orderItem1 = new OrderItem();
-		orderItem1.setPrice(19.99);
+		orderItem1.setPrice(29.99);
 		orderItem1.setQty(6);
 		Product product1 = new Product();
 		product1.setSku(this.product1.getSku());
@@ -100,10 +102,14 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		order.setOrderItems(Arrays.asList(orderItem1));
 
 		// When
-		ResponseEntity<Order> responseEntity = testRestTemplate.postForEntity(baseUrl + "/orders", order, Order.class);
+		ResponseEntity<String> orderCreatedResponse = testRestTemplate.postForEntity(baseUrl + "/orders", order, null);
+		assertEquals(HttpStatus.CREATED, orderCreatedResponse.getStatusCode());
+		URI orderLocation = orderCreatedResponse.getHeaders().getLocation();
+		assertNotNull(orderLocation);
 
+		ResponseEntity<Order> responseEntity = testRestTemplate.getForEntity(orderLocation, Order.class);
 		// Then
-		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
 		Order savedOrder = responseEntity.getBody();
 
@@ -112,8 +118,8 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		OrderItem savedOrderItem = savedOrderItems.get(0);
 		assertNotNull(savedOrderItem.getId());
 		assertEquals(6, savedOrderItem.getQty());
-		assertEquals(19.99, savedOrderItem.getPrice(), 0.0001);
-		assertEquals(product1, savedOrderItem.getProduct());
+		assertEquals(29.99, savedOrderItem.getPrice(), 0.0001);
+		assertEquals(this.product1, savedOrderItem.getProduct());
 
 		assertEquals(address, savedOrder.getAddress());
 
@@ -140,7 +146,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		order.setOrderItems(Arrays.asList(orderItem1));
 
 		// When
-		ResponseEntity<Order> responseEntity = testRestTemplate.postForEntity(baseUrl + "/orders", order, Order.class);
+		ResponseEntity<Order> responseEntity = testRestTemplate.postForEntity(baseUrl + "/orders", order, null);
 
 		// Then
 		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());

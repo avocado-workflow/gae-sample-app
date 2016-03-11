@@ -33,7 +33,7 @@ public class DefaultOrderService implements OrderService {
 	}
 
 	@Override
-	public Order save(Order order) {
+	public Long save(Order order) {
 		validateOrder(order);
 
 		return orderRepository.save(order);

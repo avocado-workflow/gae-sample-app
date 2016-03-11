@@ -1,6 +1,8 @@
 package demo.loadtest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Closeable;
 import java.net.URI;
@@ -37,6 +39,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 
 	private static final Logger log = Logger.getLogger(OrderCreationLoadTest.class.getName());
 	private String baseUrl = "http://localhost:8080";
+//	private String baseUrl = "https://psychic-city-78613.appspot.com";
 
 	private Map<String, Long> threadStats = Collections.synchronizedMap(new TreeMap<String, Long>());
 
@@ -78,13 +81,12 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	@Test
 	public void testOrderCreation() throws Exception {
 		
-		int NUM_OF_ORDERS_TO_CREATE = 1;
+		int NUM_OF_ORDERS_TO_CREATE = 10000;
 		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
 		int NUM_OF_PRODUCTS_TO_USE = 5 > products.length ? products.length : 5;
-		
 		
 		final Queue<Order> ordersQueue = new ConcurrentLinkedQueue<Order>();
 
@@ -114,7 +116,8 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 				public void run() {
 					try {
 						long start = System.currentTimeMillis();
-						URI responseEntity = testRestTemplate.postForLocation(baseUrl + "/orders", ordersQueue.poll());
+						URI orderLocation = testRestTemplate.postForLocation(baseUrl + "/orders", ordersQueue.poll());
+						assertNotNull(orderLocation);
 						long end = System.currentTimeMillis();
 						threadStats.put(Thread.currentThread().getName(), end - start);
 					} catch (Exception e) {
