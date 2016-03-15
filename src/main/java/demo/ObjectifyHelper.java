@@ -21,6 +21,7 @@ import javax.servlet.ServletContextListener;
 
 import com.googlecode.objectify.ObjectifyService;
 
+import demo.model.Measurement;
 import demo.model.Order;
 import demo.model.OrderItem;
 import demo.model.Product;
@@ -30,6 +31,7 @@ public class ObjectifyHelper implements ServletContextListener {
 		ObjectifyService.register(Product.class);
 		ObjectifyService.register(Order.class);
 		ObjectifyService.register(OrderItem.class);
+		ObjectifyService.register(Measurement.class);
 	}
 
 	public void contextInitialized(ServletContextEvent event) {

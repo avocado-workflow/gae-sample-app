@@ -6,7 +6,7 @@ public interface ProductService {
 
 	Iterable<Product> getAll();
 
-	Product getBySku(String sku);
+	Product getByCode(String code);
 
 	Product save(Product product);
 

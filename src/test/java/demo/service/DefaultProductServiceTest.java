@@ -14,6 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import demo.model.Product;
 import demo.repository.ProductRepository;
+import demo.util.Profiler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultProductServiceTest {
@@ -21,6 +22,9 @@ public class DefaultProductServiceTest {
 	@InjectMocks
 	private DefaultProductService unit;
 
+	@Mock
+	private Profiler profiler;
+	
 	@Mock
 	private ProductRepository productRepository;
 
@@ -32,7 +36,7 @@ public class DefaultProductServiceTest {
 		when(productRepository.findOne(anyString())).thenReturn(product);
 
 		// When
-		Product returnedValue = unit.getBySku("12123");
+		Product returnedValue = unit.getByCode("12123");
 
 		// Then
 		verify(productRepository).findOne("12123");
@@ -47,7 +51,7 @@ public class DefaultProductServiceTest {
 		when(productRepository.findOne(anyString())).thenReturn(null);
 
 		// When
-		Product returnedValue = unit.getBySku("12123");
+		Product returnedValue = unit.getByCode("12123");
 
 		// Then
 		verify(productRepository).findOne("12123");
