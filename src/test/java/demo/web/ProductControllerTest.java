@@ -57,8 +57,8 @@ public class ProductControllerTest extends BaseIntegrationTest {
 
 	@After
 	public void tearDown() {
-		testRestTemplate.delete(baseUrl + "/products/" + product1.getSku());
-		testRestTemplate.delete(baseUrl + "/products/" + product2.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + product1.getCode());
+		testRestTemplate.delete(baseUrl + "/products/" + product2.getCode());
 	}
 
 	@Test
@@ -92,20 +92,20 @@ public class ProductControllerTest extends BaseIntegrationTest {
 		assertEquals(product.getName(), createdProduct.getName());
 		assertEquals(product.getDescription(), createdProduct.getDescription());
 		assertEquals(product.getPrice(), createdProduct.getPrice());
-		assertNotNull(createdProduct.getSku());
+		assertNotNull(createdProduct.getCode());
 		
 		// Cleanup
-		testRestTemplate.delete(baseUrl + "/products/" + createdProduct.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + createdProduct.getCode());
 	}
 
 	@Test
 	public void testProductDeletion() throws Exception {
-		ResponseEntity<Product> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products/" + product1.getSku(), Product.class);
+		ResponseEntity<Product> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products/" + product1.getCode(), Product.class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-		testRestTemplate.delete(baseUrl + "/products/" + product1.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + product1.getCode());
 		
-		ResponseEntity<String> responseWithNotFound = testRestTemplate.getForEntity(baseUrl + "/products/" + product1.getSku(), String.class);
+		ResponseEntity<String> responseWithNotFound = testRestTemplate.getForEntity(baseUrl + "/products/" + product1.getCode(), String.class);
 		assertEquals(HttpStatus.NOT_FOUND, responseWithNotFound.getStatusCode());
 		assertEquals("Product not found", responseWithNotFound.getBody());
 
@@ -119,9 +119,9 @@ public class ProductControllerTest extends BaseIntegrationTest {
 		product.setPrice(15.87);
 		product.setDescription("Updated - Fresh tropic lemons 1");
 		
-		String skuToUpdate = product1.getSku();
+		String skuToUpdate = product1.getCode();
 		// When
-		testRestTemplate.put(baseUrl + "/products/" + product1.getSku(), product);
+		testRestTemplate.put(baseUrl + "/products/" + product1.getCode(), product);
 
 		// Then
 		ResponseEntity<Product> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products/" + skuToUpdate, Product.class);
@@ -134,16 +134,16 @@ public class ProductControllerTest extends BaseIntegrationTest {
 		assertEquals(product.getName(), createdProduct.getName());
 		assertEquals(product.getDescription(), createdProduct.getDescription());
 		assertEquals(product.getPrice(), createdProduct.getPrice());
-		assertEquals(skuToUpdate, createdProduct.getSku());
+		assertEquals(skuToUpdate, createdProduct.getCode());
 		
 		// Cleanup
-		testRestTemplate.delete(baseUrl + "/products/" + createdProduct.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + createdProduct.getCode());
 	}
 	
 	@Test
 	public void testGetBySku() throws Exception {
 		// Given	
-		String skuToFind = product1.getSku();
+		String skuToFind = product1.getCode();
 
 		// When
 		ResponseEntity<Product> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products/" + skuToFind, Product.class);

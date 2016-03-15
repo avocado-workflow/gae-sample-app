@@ -55,7 +55,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		product1.setDescription("Int test product 1 description");
 		product1.setPrice(20.1);
 		product1.setName("IT product 1");
-		product1.setSku(UUID.randomUUID().toString());
+		product1.setCode(UUID.randomUUID().toString());
 
 		ResponseEntity<Product> responseEntity = testRestTemplate.postForEntity(baseUrl + "/products", product1, Product.class);
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -66,7 +66,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		product2.setDescription("Int test product 2 description");
 		product2.setName("IT product 2");
 		product2.setPrice(10.5);
-		product2.setSku(UUID.randomUUID().toString());
+		product2.setCode(UUID.randomUUID().toString());
 
 		responseEntity = testRestTemplate.postForEntity(baseUrl + "/products", product2, Product.class);
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -78,8 +78,8 @@ public class OrderControllerTest extends BaseIntegrationTest {
 	@After
 	public void tearDown() throws Exception {
 		session.close();
-		testRestTemplate.delete(baseUrl + "/products/" + product1.getSku());
-		testRestTemplate.delete(baseUrl + "/products/" + product2.getSku());
+		testRestTemplate.delete(baseUrl + "/products/" + product1.getCode());
+		testRestTemplate.delete(baseUrl + "/products/" + product2.getCode());
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		orderItem1.setPrice(29.99);
 		orderItem1.setQty(6);
 		Product product1 = new Product();
-		product1.setSku(this.product1.getSku());
+		product1.setCode(this.product1.getCode());
 		orderItem1.setProduct(product1);
 
 		order.setOrderItems(Arrays.asList(orderItem1));
@@ -140,7 +140,7 @@ public class OrderControllerTest extends BaseIntegrationTest {
 		orderItem1.setPrice(product1.getPrice() - 0.11);
 		orderItem1.setQty(6);
 		Product product1 = new Product();
-		product1.setSku(this.product1.getSku());
+		product1.setCode(this.product1.getCode());
 		orderItem1.setProduct(product1);
 
 		order.setOrderItems(Arrays.asList(orderItem1));

@@ -54,7 +54,7 @@ public class GoogleDatastoreProductRepositoryTest {
 		String sku = "713288ff-7237-1389-6138-76713ae8s891";
 
 		Product product = new Product();
-		product.setSku(sku);
+		product.setCode(sku);
 		product.setName("pinapple");
 		product.setPrice(44.5);
 		product.setDescription("fresh pinapples");
@@ -63,7 +63,7 @@ public class GoogleDatastoreProductRepositoryTest {
 		
 		
 		Product productToUpdate = new Product();
-		productToUpdate.setSku(sku);
+		productToUpdate.setCode(sku);
 		productToUpdate.setName("oranges");
 		productToUpdate.setPrice(88.5);
 		

@@ -1,34 +1,57 @@
 package demo.repository;
 
-import org.springframework.stereotype.Component;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import demo.model.Order;
 import demo.model.Product;
 
-@Component
-public class BasicCacheImpl<V> implements Cache<V> {
+//@Component
+public class BasicCacheImpl<T> implements Cache<T> {
 
-	// private static Map<Class<?>, Class<?>> keyTypesRegistry = new
-	// HashMap<Class<?>, Class<?>>();
-	//
-	// static{
-	// keyTypesRegistry.put(Product.class, String.class);
-	// keyTypesRegistry.put(Order.class, Long.class);
-	// }
+	private static Map<Class<?>, String> keysForAllRegistry = new HashMap<Class<?>, String>();
+
+	static {
+		keysForAllRegistry.put(Product.class, "ALL_PRODUCTS");
+		keysForAllRegistry.put(Order.class, "ALL_ORDERS");
+	}
 
 	private MemcacheService cache = MemcacheServiceFactory.getMemcacheService();
-
+	
+	private Class<T> type;
+	
+	public BasicCacheImpl(Class<T> type) {
+		this.type = type;
+	}
+	
 	@Override
 	public void put(String key, Object value) {
 		ObjectifyService.ofy().save().entity(value).now();
 		cache.put(key, value);
+		cache.delete(keysForAllRegistry.get(type));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<T> getAllOrdered() {
+		Object cachedValue = cache.get(keysForAllRegistry.get(type));
+		if (cachedValue == null) {
+			List<T> entitiesFromDatastore = ObjectifyService.ofy().load().type(type).order("-sortOrder").order("name").list();
+			cache.put(keysForAllRegistry.get(type), entitiesFromDatastore);
+			return entitiesFromDatastore;
+		} else {
+			return (Collection<T>)cachedValue;
+		}
 	}
 
 	@Override
-	public V get(String key, Class<V> type) {
+	public T get(String key) {
 		Object value = cache.get(key);
 		if (value == null) {
 			value = ObjectifyService.ofy().load().type(type).id(key).now();
@@ -36,15 +59,13 @@ public class BasicCacheImpl<V> implements Cache<V> {
 				cache.put(key, value);
 			}
 		}
-		if (type.isInstance(value)) {
-			return (V) value;
-		}
-		return null;
+		return (T) value;
 	}
 
 	@Override
 	public void remove(String key) {
-		ObjectifyService.ofy().delete().type(Product.class).id(key).now();
+		ObjectifyService.ofy().delete().type(type).id(key).now();
 		cache.delete(key);
+		cache.delete(keysForAllRegistry.get(type));
 	}
 }

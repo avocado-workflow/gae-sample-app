@@ -2,7 +2,6 @@ package demo.loadtest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.Closeable;
 import java.net.URI;
@@ -22,24 +21,26 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.http.HttpMethod;
+import org.junit.experimental.categories.Category;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.googlecode.objectify.ObjectifyService;
 
 import demo.EmbeddedDataStore;
+import demo.LoadTests;
 import demo.model.Address;
 import demo.model.Order;
 import demo.model.OrderItem;
 import demo.model.Product;
 import demo.web.BaseIntegrationTest;
 
+@Category(LoadTests.class)
 public class OrderCreationLoadTest extends BaseIntegrationTest {
 
 	private static final Logger log = Logger.getLogger(OrderCreationLoadTest.class.getName());
-	private String baseUrl = "http://localhost:8080";
-//	private String baseUrl = "https://psychic-city-78613.appspot.com";
+//	private String baseUrl = "http://localhost:8080";
+	private String baseUrl = "https://psychic-city-78613.appspot.com";
 
 	private Map<String, Long> threadStats = Collections.synchronizedMap(new TreeMap<String, Long>());
 
@@ -62,6 +63,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	public void tearDown() throws Exception {
 		session.close();
 	}
+	
 	@Ignore
 	@Test
 	public void testGetAllProducts() throws Exception {
@@ -77,16 +79,16 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		System.out.println(threadStats);
 	}
 	
-	@Ignore
+//	@Ignore
 	@Test
 	public void testOrderCreation() throws Exception {
 		
-		int NUM_OF_ORDERS_TO_CREATE = 10000;
+		int NUM_OF_ORDERS_TO_CREATE = 1000;
 		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
-		int NUM_OF_PRODUCTS_TO_USE = 5 > products.length ? products.length : 5;
+		int NUM_OF_PRODUCTS_TO_USE = 180 > products.length ? products.length : 80;
 		
 		final Queue<Order> ordersQueue = new ConcurrentLinkedQueue<Order>();
 
@@ -98,14 +100,15 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 			address.setLine2("NY, USA");
 			address.setZipCode("10010");
 			order.setAddress(address);
+
+			Product productToOrder = products[i%NUM_OF_PRODUCTS_TO_USE];
 	
 			OrderItem orderItem1 = new OrderItem();
-			orderItem1.setPrice(19.99);
-			orderItem1.setQty(6);
+			orderItem1.setPrice(productToOrder.getPrice());
+			orderItem1.setQty(4);
 			Product product1 = new Product();
-			product1.setSku(products[i%NUM_OF_PRODUCTS_TO_USE].getSku());
+			product1.setCode(productToOrder.getCode());
 			orderItem1.setProduct(product1);
-			orderItem1.getProduct();
 			order.setOrderItems(Arrays.asList(orderItem1));
 			ordersQueue.offer(order);
 		}

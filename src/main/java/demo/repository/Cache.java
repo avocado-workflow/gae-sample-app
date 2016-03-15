@@ -1,10 +1,14 @@
 package demo.repository;
 
-public interface Cache<V> {
+import java.util.Collection;
 
-	void put(String key, V val);
+public interface Cache<T> {
+
+	void put(String key, T val);
 	
-	V get(String key, Class<V> type);
+	T get(String key);
 
+	Collection<T> getAllOrdered();
+	
 	void remove(String key);
 }

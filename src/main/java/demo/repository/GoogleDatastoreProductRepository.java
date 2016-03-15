@@ -13,24 +13,23 @@ import demo.model.Product;
 @Repository
 public class GoogleDatastoreProductRepository implements ProductRepository {
 
-	@Resource
+	@Resource(name = "productsCache")
 	private Cache<Product> cache;
 
 	@Override
-	public Iterable<Product> findAll() {ObjectifyService.ofy().clear();
-		// TODO : no cache yet. Implement this
-		return ObjectifyService.ofy().load().type(Product.class).list();
+	public Iterable<Product> findAllOrdered() {
+		return cache.getAllOrdered();
 	}
 
 	@Override
 	public Product findOne(String sku) {
-		return cache.get(sku, Product.class);
+		return cache.get(sku);
 	}
 
 	@Override
 	public Product save(Product product) {
-		product.setSku(UUID.randomUUID().toString());
-		cache.put(product.getSku(), product);
+		product.setCode(UUID.randomUUID().toString());
+		cache.put(product.getCode(), product);
 		return product;
 	}
 
@@ -41,6 +40,6 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 
 	@Override
 	public void update(Product product) {
-		cache.put(product.getSku(), product);
+		cache.put(product.getCode(), product);
 	}
 }

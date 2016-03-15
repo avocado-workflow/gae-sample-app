@@ -4,7 +4,7 @@ import demo.model.Product;
 
 public interface ProductRepository {
 
-	Iterable<Product> findAll();
+	Iterable<Product> findAllOrdered();
 
 	Product findOne(String sku);
 

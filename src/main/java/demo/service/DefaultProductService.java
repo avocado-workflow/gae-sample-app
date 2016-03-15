@@ -15,7 +15,7 @@ public class DefaultProductService implements ProductService {
 
 	@Override
 	public Iterable<Product> getAll() {
-		return productRepository.findAll();
+		return productRepository.findAllOrdered();
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class DefaultProductService implements ProductService {
 
 	@Override
 	public void update(String sku, Product product) {
-		product.setSku(sku);
+		product.setCode(sku);
 		productRepository.update(product);
 	}
 

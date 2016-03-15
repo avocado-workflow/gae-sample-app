@@ -67,7 +67,7 @@ public class DefaultProductServiceTest {
 		// Then
 		Product productToSave = new Product();
 		productToSave.setName("oranges");
-		productToSave.setSku("12123");
+		productToSave.setCode("12123");
 		verify(productRepository).update(eq(productToSave));
 	}
 }

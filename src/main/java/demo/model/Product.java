@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Unindex;
 
 //@Cache
 @Entity
@@ -12,19 +14,45 @@ public class Product implements Serializable {
 	private static final long serialVersionUID = 7207486889933893760L;
 
 	@Id
-	private String sku;
+	private String code;
+	
+	@Index
 	private String name;
+	
+	@Unindex
 	private String description;
+
 	private Double price;
+	@Unindex
+	private String notes;
+	
+	@Index
+	private int sortOrder;
 
 	// TODO : add image blob byte[]?
-	
-	public String getSku() {
-		return sku;
+
+	public String getNotes() {
+		return notes;
 	}
 
-	public void setSku(String sku) {
-		this.sku = sku;
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public int getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(int sortOrder) {
+		this.sortOrder = sortOrder;
+	}
+	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {
@@ -58,7 +86,7 @@ public class Product implements Serializable {
 		result = prime * result + ((description == null) ? 0 : description.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((price == null) ? 0 : price.hashCode());
-		result = prime * result + ((sku == null) ? 0 : sku.hashCode());
+		result = prime * result + ((code == null) ? 0 : code.hashCode());
 		return result;
 	}
 
@@ -86,16 +114,16 @@ public class Product implements Serializable {
 				return false;
 		} else if (!price.equals(other.price))
 			return false;
-		if (sku == null) {
-			if (other.sku != null)
+		if (code == null) {
+			if (other.code != null)
 				return false;
-		} else if (!sku.equals(other.sku))
+		} else if (!code.equals(other.code))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Product [sku=" + sku + ", name=" + name + ", description=" + description + ", price=" + price + "]";
+		return "Product [code=" + code + ", name=" + name + ", description=" + description + ", price=" + price + "]";
 	}
 }

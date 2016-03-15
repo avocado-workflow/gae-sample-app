@@ -44,17 +44,17 @@ public class GoogleDatastoreOrderRepositoryTest {
 		ObjectifyService.register(Order.class);
 		ObjectifyService.register(OrderItem.class);
 
-		product1.setSku("23d2680c-141f-4220-9444-ab076df3bf58");
+		product1.setCode("23d2680c-141f-4220-9444-ab076df3bf58");
 		product1.setName("orange");
 		product1.setPrice(4.5);
 		product1.setDescription("fresh oranges");
 
-		product2.setSku("8981304a-12f4-3122-9891-fed8a8d776e0");
+		product2.setCode("8981304a-12f4-3122-9891-fed8a8d776e0");
 		product2.setName("lemon");
 		product2.setPrice(5.0);
 		product2.setDescription("fresh lemons");
 
-		product3.setSku("713288ff-7237-1389-6138-76713ae8s891");
+		product3.setCode("713288ff-7237-1389-6138-76713ae8s891");
 		product3.setName("pinapple");
 		product3.setPrice(6.4);
 		product3.setDescription("fresh pinapples");
@@ -84,7 +84,7 @@ public class GoogleDatastoreOrderRepositoryTest {
 		orderItem1.setPrice(6.8);
 		orderItem1.setQty(4);
 		Product product = new Product();
-		product.setSku(product1.getSku());
+		product.setCode(product1.getCode());
 		orderItem1.setProduct(product);
 
 		order.setOrderItems(Arrays.asList(orderItem1));
@@ -105,7 +105,7 @@ public class GoogleDatastoreOrderRepositoryTest {
 		assertNotNull(orderItemFromDatastore.getOrder());
 		assertEquals(4, orderItemFromDatastore.getQty());
 		assertEquals(6.8, orderItemFromDatastore.getPrice(), 0.0001);
-		assertEquals(product.getSku(), orderItemFromDatastore.getProductSku());
+		assertEquals(product.getCode(), orderItemFromDatastore.getProductSku());
 
 		assertNotNull(savedOrder);
 
@@ -132,7 +132,7 @@ public class GoogleDatastoreOrderRepositoryTest {
 		orderItem1.setPrice(6.8);
 		orderItem1.setQty(4);
 		Product product = new Product();
-		product.setSku(product1.getSku());
+		product.setCode(product1.getCode());
 		orderItem1.setProduct(product);
 
 		order.setOrderItems(Arrays.asList(orderItem1));

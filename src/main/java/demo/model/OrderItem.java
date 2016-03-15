@@ -55,7 +55,7 @@ public class OrderItem {
 	}
 
 	public void setProduct(Product product) {
-		this.productSku = product.getSku();
+		this.productSku = product.getCode();
 		this.product = product;
 	}
 
