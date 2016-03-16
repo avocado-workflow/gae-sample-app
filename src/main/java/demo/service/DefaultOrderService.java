@@ -1,5 +1,6 @@
 package demo.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -67,5 +68,10 @@ public class DefaultOrderService implements OrderService {
 				throw new RequestValidationException("Order price " + orderPrice + " is below product price" + productPrice);
 			}
 		}
+	}
+
+	@Override
+	public Iterable<Order> getByOrderDate(Date orderDate) {
+		return orderRepository.findAllByCreatedOn(orderDate);
 	}
 }

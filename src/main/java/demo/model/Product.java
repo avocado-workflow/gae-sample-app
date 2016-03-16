@@ -9,7 +9,7 @@ import com.googlecode.objectify.annotation.Unindex;
 
 //@Cache
 @Entity
-public class Product implements Serializable {
+public class Product implements Serializable, Comparable<Product> {
 	
 	private static final long serialVersionUID = 7207486889933893760L;
 
@@ -125,5 +125,12 @@ public class Product implements Serializable {
 	@Override
 	public String toString() {
 		return "Product [code=" + code + ", name=" + name + ", description=" + description + ", price=" + price + "]";
+	}
+
+	@Override
+	public int compareTo(Product o) {
+		int byName = this.getName().compareTo(o.getName());
+		int bySortOrder = Integer.compare(o.getSortOrder(), this.getSortOrder());
+		return bySortOrder == 0 ? byName : bySortOrder;
 	}
 }

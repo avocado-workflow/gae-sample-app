@@ -4,19 +4,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
+import javax.annotation.Resource;
+
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
+import demo.model.Measurement;
 import demo.model.Order;
 import demo.model.OrderItem;
 import demo.model.Product;
+import demo.util.Profiler;
 
 @Repository
 public class GoogleDatastoreOrderRepository implements OrderRepository {
+
+	@Resource
+	private Profiler profiler;
 
 	@Override
 	public Iterable<Order> findAll() {
@@ -27,19 +36,34 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 	public Order findOne(Long id) {
 		Order order = ObjectifyService.ofy().load().type(Order.class).id(id).now();
 
-		List<OrderItem> orderItems = ObjectifyService.ofy().load().type(OrderItem.class).ancestor(order).list();
-		order.setOrderItems(orderItems);
+		Measurement m = new Measurement("OrderRepository", "getAllOrderItemsByAncestor");
+		m.setStartTime(System.currentTimeMillis());
 		
+		List<OrderItem> orderItems = ObjectifyService.ofy().cache(false).load().type(OrderItem.class).ancestor(order).list();
+
+		m.setEndTime(System.currentTimeMillis());
+		profiler.submitMeasurementAsync(m);
+		
+		order.setOrderItems(orderItems);
+
+
 		Map<Key<Product>, OrderItem> itemsToProductMap = new HashMap<>();
 		for (OrderItem orderItem : orderItems) {
 			itemsToProductMap.put(Key.create(Product.class, orderItem.getProductSku()), orderItem);
 		}
 
-		Map<Key<Product>, Product> products = ObjectifyService.ofy().load().keys(itemsToProductMap.keySet());
+		m = new Measurement("OrderRepository", "getProductsForAllOrderItemsByKeys");
+		m.setStartTime(System.currentTimeMillis());
+		
+		Map<Key<Product>, Product> products = ObjectifyService.ofy().cache(false).load().keys(itemsToProductMap.keySet());
+		
+		m.setEndTime(System.currentTimeMillis());
+		profiler.submitMeasurementAsync(m);
+
 		for (Entry<Key<Product>, OrderItem> entry : itemsToProductMap.entrySet()) {
 			entry.getValue().setProduct(products.get(entry.getKey()));
 		}
-		
+
 		return order;
 	}
 
@@ -61,7 +85,26 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 
 	@Override
 	public void delete(Long id) {
-		ObjectifyService.ofy().delete().keys(ObjectifyService.ofy().load()
-				.ancestor(Key.<Order> create(Order.class, id)).keys().list()).now(); 
+		ObjectifyService.ofy().delete().keys(ObjectifyService.ofy().load().ancestor(Key.<Order> create(Order.class, id)).keys().list())
+				.now();
+	}
+
+	@Override
+	public Iterable<Order> findAllByCreatedOn(Date orderDate) {
+		Long orderDateStartMillis = new DateTime(orderDate).withTimeAtStartOfDay().getMillis();
+		Long orderDateEndMillis = new DateTime(orderDate).plusDays(1).withTimeAtStartOfDay().getMillis() + 1000000000;
+		Measurement m = new Measurement("OrderRepository", "findAllByCreatedOn");
+		m.setStartTime(System.currentTimeMillis());
+		
+//		ObjectifyService.ofy().load().type(Order.class).filter("createdOn >=", orderDateStartMillis).
+//		filter("createdOn <=", orderDateStartMillis+100000000).list();
+		
+		List<Order> orders = ObjectifyService.ofy().load().type(Order.class).filter("createdOn >=", orderDateStartMillis)
+				.filter("createdOn <", orderDateEndMillis).order("-createdOn").list();
+
+		m.setEndTime(System.currentTimeMillis());
+		profiler.submitMeasurementAsync(m);
+
+		return orders;
 	}
 }

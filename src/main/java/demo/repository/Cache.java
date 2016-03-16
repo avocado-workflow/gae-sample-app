@@ -11,4 +11,6 @@ public interface Cache<T> {
 	Collection<T> getAllOrdered();
 	
 	void remove(String key);
+
+	<C extends Comparable<C>> Collection<C> getAllOrderedKeysFirstApproach(Class<C> type);
 }

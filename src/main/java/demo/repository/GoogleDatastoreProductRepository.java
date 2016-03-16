@@ -34,6 +34,19 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 		
 		return allProducts;
 	}
+	
+	@Override
+	public Iterable<Product> findAllOrderedKeysFirstApproach() {
+		Measurement m = new Measurement("ProductRepository", "findAllOrderedKeysFirstApproach");
+		m.setStartTime(System.currentTimeMillis());
+		
+		Collection<Product> allProducts = cache.getAllOrderedKeysFirstApproach(Product.class);
+		
+		m.setEndTime(System.currentTimeMillis());
+		profiler.submitMeasurementAsync(m);
+		
+		return allProducts;
+	}
 
 	@Override
 	public Product findOne(String code) {

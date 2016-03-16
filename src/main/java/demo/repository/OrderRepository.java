@@ -1,5 +1,7 @@
 package demo.repository;
 
+import java.util.Date;
+
 import demo.model.Order;
 
 public interface OrderRepository {
@@ -11,4 +13,6 @@ public interface OrderRepository {
 	Long save(Order order);
 
 	void delete(Long id);
+
+	Iterable<Order> findAllByCreatedOn(Date orderDate);
 }

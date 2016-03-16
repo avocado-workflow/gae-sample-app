@@ -30,6 +30,19 @@ public class DefaultProductService implements ProductService {
 		
 		return allProducts;
 	}
+	
+	@Override
+	public Iterable<Product> getAllKeysFirstApproach() {
+		Measurement m = new Measurement("DefaultProductService", "getAllKeysFirstApproach");
+		m.setStartTime(System.currentTimeMillis());
+		
+		Iterable<Product> allProducts = productRepository.findAllOrderedKeysFirstApproach();
+
+		m.setEndTime(System.currentTimeMillis());
+		profiler.submitMeasurementAsync(m);
+		
+		return allProducts;	
+	}
 
 	@Override
 	public Product getByCode(String code) {

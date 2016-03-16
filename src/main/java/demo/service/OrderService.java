@@ -1,5 +1,7 @@
 package demo.service;
 
+import java.util.Date;
+
 import demo.model.Order;
 
 public interface OrderService {
@@ -13,4 +15,6 @@ public interface OrderService {
 	void update(Long id, Order order);
 
 	void delete(Long id);
+
+	Iterable<Order> getByOrderDate(Date orderDate);
 }

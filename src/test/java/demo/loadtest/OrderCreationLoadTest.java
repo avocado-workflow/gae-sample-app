@@ -5,8 +5,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.Closeable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -14,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -83,13 +86,13 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	@Test
 	public void testOrderCreation() throws Exception {
 		
-		int NUM_OF_ORDERS_TO_CREATE = 1000;
+		int NUM_OF_ORDERS_TO_CREATE = 3;
 		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
-		int NUM_OF_PRODUCTS_TO_USE = 180 > products.length ? products.length : 80;
-		
+		int NUM_OF_PRODUCTS_TO_USE = 200 > products.length ? products.length : 80;
+		System.out.println("PRODUCTS USED: " + NUM_OF_PRODUCTS_TO_USE);
 		final Queue<Order> ordersQueue = new ConcurrentLinkedQueue<Order>();
 
 		for(int i = 0; i < NUM_OF_ORDERS_TO_CREATE; i++) {
@@ -135,6 +138,49 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 
 		System.out.println(threadStats);
+	}		
+	
+	@Ignore
+	@Test
+	public void createOneOrderWithLotsOfItems() throws Exception {
+		
+		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		Product[] products = responseEntity.getBody();
+		
+		int NUM_OF_PRODUCTS_TO_USE = 200 > products.length ? products.length : 200;
+		System.out.println("PRODUCTS USED: " + NUM_OF_PRODUCTS_TO_USE);
+		for(int o=0;o<10;o++) {
+			
+		Order order = new Order();
+		
+		Address address = new Address();
+		address.setLine1("address #BIG" );
+		address.setLine2("HUGE ORDER");
+		address.setZipCode("10010");
+		order.setAddress(address);
+		List<OrderItem> orderItems = new ArrayList<>();
+		
+		for(int i = 0; i < NUM_OF_PRODUCTS_TO_USE; i++) {
+			
+			Product productToOrder = products[i];
+			
+			OrderItem orderItem1 = new OrderItem();
+			orderItem1.setPrice(productToOrder.getPrice());
+			orderItem1.setQty(4);
+			Product product1 = new Product();
+			product1.setCode(productToOrder.getCode());
+			orderItem1.setProduct(product1);
+			orderItems.add(orderItem1);
+		}
+		
+		order.setOrderItems(orderItems);
+
+		URI orderLocation = testRestTemplate.postForLocation(baseUrl + "/orders", order);
+		assertNotNull(orderLocation);
+		log.log(Level.INFO, orderLocation.toString());
+		System.out.println(orderLocation);
+		}
 	}		
 
 	private Runnable getProductsRunnable = new Runnable() {

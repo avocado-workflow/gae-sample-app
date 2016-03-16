@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
@@ -14,7 +16,8 @@ public class Order {
 
 	@Id
 	private Long id;
-
+	
+	@JsonIgnore
 	@Index
 	private Date createdOn = new Date();
 
@@ -33,6 +36,7 @@ public class Order {
 		this.id = id;
 	}
 
+//	@JsonProperty
 	public Date getCreatedOn() {
 		return createdOn;
 	}

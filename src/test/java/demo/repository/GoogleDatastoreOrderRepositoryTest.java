@@ -11,6 +11,10 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -22,13 +26,19 @@ import demo.model.Address;
 import demo.model.Order;
 import demo.model.OrderItem;
 import demo.model.Product;
+import demo.util.Profiler;
 
+@RunWith(MockitoJUnitRunner.class)
 public class GoogleDatastoreOrderRepositoryTest {
 
 	private Closeable session;
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
+	@Mock
+	private Profiler profiler;
+	
+	@InjectMocks
 	private GoogleDatastoreOrderRepository unit = new GoogleDatastoreOrderRepository();
 
 	private Product product1 = new Product();

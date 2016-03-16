@@ -13,4 +13,6 @@ public interface ProductService {
 	void update(String sku, Product product);
 
 	void deleteProduct(String sku);
+
+	Iterable<Product> getAllKeysFirstApproach();
 }

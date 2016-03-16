@@ -13,4 +13,6 @@ public interface ProductRepository {
 	void deleteBySku(String sku);
 
 	void update(Product product);
+
+	Iterable<Product> findAllOrderedKeysFirstApproach();
 }

@@ -15,6 +15,7 @@ import demo.model.Measurement;
 import demo.model.Product;
 import demo.service.ProductService;
 import demo.util.Profiler;
+import demo.util.RequestIdProvider;
 
 @RestController
 @RequestMapping("/products")
@@ -38,6 +39,18 @@ public class ProductController {
 		return products;
 	}
 
+	@RequestMapping(value="/keysfirst", method = RequestMethod.GET)
+	public Iterable<Product> getAllKeysFirstApproach() {
+		Measurement m = new Measurement("ProductController", "getAllKeysFirstApproach");
+		
+		m.setStartTime(System.currentTimeMillis());
+		Iterable<Product> products = productService.getAllKeysFirstApproach();
+		m.setEndTime(System.currentTimeMillis());
+		
+		profiler.submitMeasurementAsync(m);
+		return products;
+		
+	}
 	@RequestMapping(value = "/{code}", method = RequestMethod.GET)
 	public ResponseEntity<?> getProductByCode(@PathVariable String code) {
 		Measurement m = new Measurement("ProductController", "getProductByCode");
