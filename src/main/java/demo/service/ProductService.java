@@ -4,7 +4,13 @@ import demo.model.Product;
 
 public interface ProductService {
 
-	Iterable<Product> getAll();
+	Iterable<Product> getAllUnordered();
+
+	Iterable<Product> getAllUnorderedKeysFirstApproach();
+
+	Iterable<Product> getAllOrdered();
+
+	Iterable<Product> getAllOrderedKeysFirstApproach();
 
 	Product getByCode(String code);
 
@@ -13,6 +19,4 @@ public interface ProductService {
 	void update(String sku, Product product);
 
 	void deleteProduct(String sku);
-
-	Iterable<Product> getAllKeysFirstApproach();
 }

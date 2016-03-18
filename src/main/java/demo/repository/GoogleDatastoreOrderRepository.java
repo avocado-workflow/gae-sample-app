@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 
 import javax.annotation.Resource;
@@ -37,15 +36,23 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 		Order order = ObjectifyService.ofy().load().type(Order.class).id(id).now();
 
 		Measurement m = new Measurement("OrderRepository", "getAllOrderItemsByAncestor");
-		m.setStartTime(System.currentTimeMillis());
-		
 		List<OrderItem> orderItems = ObjectifyService.ofy().cache(false).load().type(OrderItem.class).ancestor(order).list();
+		profiler.submitMeasurementAsync(m);
 
-		m.setEndTime(System.currentTimeMillis());
+		m = new Measurement("OrderRepository", "loopingToMaterialize");
+		for (OrderItem orderItem : orderItems) {
+			orderItem.hashCode();
+		}
 		profiler.submitMeasurementAsync(m);
 		
+		m = new Measurement("OrderRepository", "loopingOverMaterialized");
+		for (OrderItem orderItem : orderItems) {
+			orderItem.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+		
+		
 		order.setOrderItems(orderItems);
-
 
 		Map<Key<Product>, OrderItem> itemsToProductMap = new HashMap<>();
 		for (OrderItem orderItem : orderItems) {
@@ -53,11 +60,9 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 		}
 
 		m = new Measurement("OrderRepository", "getProductsForAllOrderItemsByKeys");
-		m.setStartTime(System.currentTimeMillis());
-		
+
 		Map<Key<Product>, Product> products = ObjectifyService.ofy().cache(false).load().keys(itemsToProductMap.keySet());
-		
-		m.setEndTime(System.currentTimeMillis());
+
 		profiler.submitMeasurementAsync(m);
 
 		for (Entry<Key<Product>, OrderItem> entry : itemsToProductMap.entrySet()) {
@@ -91,18 +96,24 @@ public class GoogleDatastoreOrderRepository implements OrderRepository {
 
 	@Override
 	public Iterable<Order> findAllByCreatedOn(Date orderDate) {
-		Long orderDateStartMillis = new DateTime(orderDate).withTimeAtStartOfDay().getMillis();
-		Long orderDateEndMillis = new DateTime(orderDate).plusDays(1).withTimeAtStartOfDay().getMillis() + 1000000000;
-		Measurement m = new Measurement("OrderRepository", "findAllByCreatedOn");
-		m.setStartTime(System.currentTimeMillis());
-		
-//		ObjectifyService.ofy().load().type(Order.class).filter("createdOn >=", orderDateStartMillis).
-//		filter("createdOn <=", orderDateStartMillis+100000000).list();
-		
-		List<Order> orders = ObjectifyService.ofy().load().type(Order.class).filter("createdOn >=", orderDateStartMillis)
-				.filter("createdOn <", orderDateEndMillis).order("-createdOn").list();
+		Date orderDateStart = new DateTime(orderDate).withTimeAtStartOfDay().toDate();
+		Date orderDateEnd = new DateTime(orderDate).plusDays(1).withTimeAtStartOfDay().toDate();
 
-		m.setEndTime(System.currentTimeMillis());
+		Measurement m = new Measurement("OrderRepository", "findAllByCreatedOn");
+		List<Order> orders = ObjectifyService.ofy().load().type(Order.class).filter("createdOn >=", orderDateStart)
+				.filter("createdOn <", orderDateEnd).order("-createdOn").list();
+		profiler.submitMeasurementAsync(m);
+		
+		m = new Measurement("OrderRepository", "loopingToMaterialize");
+		for (Order order : orders) {
+			order.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("OrderRepository", "loopingOverMaterialized");
+		for (Order order : orders) {
+			order.hashCode();
+		}
 		profiler.submitMeasurementAsync(m);
 
 		return orders;

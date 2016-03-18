@@ -20,13 +20,14 @@ public class Measurement {
 	private Date timestamp = new Date();
 
 	public Measurement() {
-	// TODO : auto-generated stub for Jackson
+		this(null,null);
 	}
 
 	public Measurement(String className, String methodName) {
 		super();
 		this.className = className;
 		this.methodName = methodName;
+		this.startTime = System.currentTimeMillis();
 	}
 	
 	public Date getTimestamp() {
@@ -37,9 +38,9 @@ public class Measurement {
 		return startTime;
 	}
 
-	public void setStartTime(Long startTime) {
-		this.startTime = startTime;
-	}
+//	public void setStartTime(Long startTime) {
+//		this.startTime = startTime;
+//	}
 
 	public Long getEndTime() {
 		return endTime;

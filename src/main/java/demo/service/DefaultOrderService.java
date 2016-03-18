@@ -51,19 +51,22 @@ public class DefaultOrderService implements OrderService {
 	public void delete(Long id) {
 		orderRepository.delete(id);
 	}
-	
+
 	// TODO : move to separate validator.
 	private void validateOrder(Order order) {
 		List<OrderItem> orderItems = order.getOrderItems();
 		for (OrderItem orderItem : orderItems) {
 			double orderPrice = orderItem.getPrice();
+			// FIXME : performance degradation here. Loop over all orderItems to
+			// get all product keys and then issue getAllproducts instead of
+			// getting them one by one as it is now.
 			Product product = productRepository.findOne(orderItem.getProduct().getCode());
 			if (product == null) {
 				throw new RequestValidationException("Specified product: " + orderItem.getProduct().getCode() + " doesn't exist");
 			}
-			
+
 			double productPrice = product.getPrice();
-	
+
 			if (orderPrice < productPrice) {
 				throw new RequestValidationException("Order price " + orderPrice + " is below product price" + productPrice);
 			}

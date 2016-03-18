@@ -15,7 +15,6 @@ import demo.model.Measurement;
 import demo.model.Product;
 import demo.service.ProductService;
 import demo.util.Profiler;
-import demo.util.RequestIdProvider;
 
 @RestController
 @RequestMapping("/products")
@@ -28,42 +27,57 @@ public class ProductController {
 	private Profiler profiler;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public Iterable<Product> getAllProducts() {
-		Measurement m = new Measurement("ProductController", "getAllProducts");
+	public Iterable<Product> getAllProductsUnordered() {
+		Measurement m = new Measurement("ProductController", "getAllProductsUnordered");
 		
-		m.setStartTime(System.currentTimeMillis());
-		Iterable<Product> products = productService.getAll();
-		m.setEndTime(System.currentTimeMillis());
+		Iterable<Product> products = productService.getAllUnordered();
 		
 		profiler.submitMeasurementAsync(m);
 		return products;
 	}
 
-	@RequestMapping(value="/keysfirst", method = RequestMethod.GET)
-	public Iterable<Product> getAllKeysFirstApproach() {
-		Measurement m = new Measurement("ProductController", "getAllKeysFirstApproach");
+	@RequestMapping(method = RequestMethod.GET, params="sort")
+	public Iterable<Product> getAllProductsOrdered() {
+		Measurement m = new Measurement("ProductController", "getAllProductsOrdered");
+
+		Iterable<Product> products = productService.getAllOrdered();
+
+		profiler.submitMeasurementAsync(m);
+		return products;
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, params="keysfirst")
+	public Iterable<Product> getAllProductsUnorderedKeysFirstApproach() {
+		Measurement m = new Measurement("ProductController", "getAllProductsUnorderedKeysFirstApproach");
 		
-		m.setStartTime(System.currentTimeMillis());
-		Iterable<Product> products = productService.getAllKeysFirstApproach();
-		m.setEndTime(System.currentTimeMillis());
+		Iterable<Product> products = productService.getAllUnorderedKeysFirstApproach();
 		
 		profiler.submitMeasurementAsync(m);
 		return products;
-		
 	}
+
+	@RequestMapping(method = RequestMethod.GET, params={"sort","keysfirst"})
+	public Iterable<Product> getAllProductsOrderedKeysFirstApproach() {
+
+		Measurement m = new Measurement("ProductController", "getAllProductsOrderedKeysFirstApproach");
+
+		Iterable<Product> products = productService.getAllOrderedKeysFirstApproach();
+
+		profiler.submitMeasurementAsync(m);
+		return products;
+	}
+
 	@RequestMapping(value = "/{code}", method = RequestMethod.GET)
 	public ResponseEntity<?> getProductByCode(@PathVariable String code) {
 		Measurement m = new Measurement("ProductController", "getProductByCode");
-		m.setStartTime(System.currentTimeMillis());
 
 		Product product = productService.getByCode(code);
 		if (product == null) {
 			return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
 		}
-		
+
 		ResponseEntity<Product> responseEntity = new ResponseEntity<>(product, HttpStatus.OK);
 
-		m.setEndTime(System.currentTimeMillis());
 		profiler.submitMeasurementAsync(m);
 
 		return responseEntity;
@@ -79,13 +93,11 @@ public class ProductController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Product createProduct(@RequestBody Product product) {
 		Measurement m = new Measurement("ProductController", "createProduct");
-		m.setStartTime(System.currentTimeMillis());
-		
+
 		Product savedProduct = productService.save(product);
-		
-		m.setEndTime(System.currentTimeMillis());
+
 		profiler.submitMeasurementAsync(m);
-		
+
 		return savedProduct;
 	}
 

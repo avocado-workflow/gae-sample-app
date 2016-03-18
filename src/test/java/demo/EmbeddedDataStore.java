@@ -28,8 +28,9 @@ public class EmbeddedDataStore extends ExternalResource {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		helper.setEnvAppId("psychic-city-78613");
-		helper.setEnvVersionId("7");
+//		helper.setEnvAppId("psychic-city-78613");
+		helper.setEnvAppId("avocado-perf-test");
+		helper.setEnvVersionId("1");
 		helper.setEnvAuthDomain("gmail.com");
 	}
 

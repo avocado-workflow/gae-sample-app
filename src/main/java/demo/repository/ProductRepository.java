@@ -4,8 +4,14 @@ import demo.model.Product;
 
 public interface ProductRepository {
 
-	Iterable<Product> findAllOrdered();
+	Iterable<Product> findAllUnordered();
+	
+	Iterable<Product> findAllUnorderedKeysFirstApproach();
 
+	Iterable<Product> findAllOrdered();
+	
+	Iterable<Product> findAllOrderedKeysFirstApproach();
+	
 	Product findOne(String sku);
 
 	Product save(Product product);
@@ -13,6 +19,4 @@ public interface ProductRepository {
 	void deleteBySku(String sku);
 
 	void update(Product product);
-
-	Iterable<Product> findAllOrderedKeysFirstApproach();
 }

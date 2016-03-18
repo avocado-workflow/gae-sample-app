@@ -43,7 +43,8 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 
 	private static final Logger log = Logger.getLogger(OrderCreationLoadTest.class.getName());
 //	private String baseUrl = "http://localhost:8080";
-	private String baseUrl = "https://psychic-city-78613.appspot.com";
+//	private String baseUrl = "https://psychic-city-78613.appspot.com";
+	private String baseUrl = "https://avocado-perf-test.appspot.com";
 
 	private Map<String, Long> threadStats = Collections.synchronizedMap(new TreeMap<String, Long>());
 
@@ -86,12 +87,12 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	@Test
 	public void testOrderCreation() throws Exception {
 		
-		int NUM_OF_ORDERS_TO_CREATE = 3;
+		int NUM_OF_ORDERS_TO_CREATE = 1;
 		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
-		int NUM_OF_PRODUCTS_TO_USE = 200 > products.length ? products.length : 80;
+		int NUM_OF_PRODUCTS_TO_USE = 10000 > products.length ? products.length : 10000;
 		System.out.println("PRODUCTS USED: " + NUM_OF_PRODUCTS_TO_USE);
 		final Queue<Order> ordersQueue = new ConcurrentLinkedQueue<Order>();
 
@@ -101,7 +102,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 			Address address = new Address();
 			address.setLine1("address #" + i);
 			address.setLine2("NY, USA");
-			address.setZipCode("10010");
+			address.setZipCode("Mar-17");
 			order.setAddress(address);
 
 			Product productToOrder = products[i%NUM_OF_PRODUCTS_TO_USE];
@@ -140,7 +141,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		System.out.println(threadStats);
 	}		
 	
-	@Ignore
+//	@Ignore
 	@Test
 	public void createOneOrderWithLotsOfItems() throws Exception {
 		
@@ -148,16 +149,16 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
-		int NUM_OF_PRODUCTS_TO_USE = 200 > products.length ? products.length : 200;
+		int NUM_OF_PRODUCTS_TO_USE = 10000 > products.length ? products.length : 10000;
 		System.out.println("PRODUCTS USED: " + NUM_OF_PRODUCTS_TO_USE);
-		for(int o=0;o<10;o++) {
+//		for(int o=0;o<10;o++) {
 			
 		Order order = new Order();
 		
 		Address address = new Address();
 		address.setLine1("address #BIG" );
-		address.setLine2("HUGE ORDER");
-		address.setZipCode("10010");
+		address.setLine2("2k items ORDER");
+		address.setZipCode("2000");
 		order.setAddress(address);
 		List<OrderItem> orderItems = new ArrayList<>();
 		
@@ -167,7 +168,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 			
 			OrderItem orderItem1 = new OrderItem();
 			orderItem1.setPrice(productToOrder.getPrice());
-			orderItem1.setQty(4);
+			orderItem1.setQty(i);
 			Product product1 = new Product();
 			product1.setCode(productToOrder.getCode());
 			orderItem1.setProduct(product1);
@@ -180,7 +181,7 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		assertNotNull(orderLocation);
 		log.log(Level.INFO, orderLocation.toString());
 		System.out.println(orderLocation);
-		}
+//		}
 	}		
 
 	private Runnable getProductsRunnable = new Runnable() {

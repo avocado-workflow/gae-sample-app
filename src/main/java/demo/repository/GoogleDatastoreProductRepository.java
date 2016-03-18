@@ -1,13 +1,10 @@
 package demo.repository;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
-
-import com.googlecode.objectify.ObjectifyService;
 
 import demo.model.Measurement;
 import demo.model.Product;
@@ -21,55 +18,39 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 
 	@Resource
 	private Profiler profiler;
-	
+
+	@Override
+	public Iterable<Product> findAllUnordered() {
+		return cache.getAllUnordered();
+	}
+
+	@Override
+	public Iterable<Product> findAllUnorderedKeysFirstApproach() {
+		return cache.getAllUnorderedKeysFirstApproach();
+	}
+
 	@Override
 	public Iterable<Product> findAllOrdered() {
-		Measurement m = new Measurement("ProductRepository", "findAllOrdered");
-		m.setStartTime(System.currentTimeMillis());
-		
-		Collection<Product> allProducts = cache.getAllOrdered();
-		
-		m.setEndTime(System.currentTimeMillis());
-		profiler.submitMeasurementAsync(m);
-		
-		return allProducts;
+		return cache.getAllOrdered();
 	}
-	
+
 	@Override
 	public Iterable<Product> findAllOrderedKeysFirstApproach() {
-		Measurement m = new Measurement("ProductRepository", "findAllOrderedKeysFirstApproach");
-		m.setStartTime(System.currentTimeMillis());
-		
-		Collection<Product> allProducts = cache.getAllOrderedKeysFirstApproach(Product.class);
-		
-		m.setEndTime(System.currentTimeMillis());
-		profiler.submitMeasurementAsync(m);
-		
-		return allProducts;
+		return cache.getAllOrderedKeysFirstApproach(Product.class);
 	}
 
 	@Override
 	public Product findOne(String code) {
-		Measurement m = new Measurement("ProductRepository", "findOne");
-		m.setStartTime(System.currentTimeMillis());
-		
-		Product product = cache.get(code);
-		
-		m.setEndTime(System.currentTimeMillis());
-		profiler.submitMeasurementAsync(m);
-		
-		return product;
+		return cache.get(code);
 	}
 
 	@Override
 	public Product save(Product product) {
 		Measurement m = new Measurement("ProductRepository", "save");
-		m.setStartTime(System.currentTimeMillis());
-		
+
 		product.setCode(UUID.randomUUID().toString());
 		cache.put(product.getCode(), product);
 
-		m.setEndTime(System.currentTimeMillis());
 		profiler.submitMeasurementAsync(m);
 
 		return product;
