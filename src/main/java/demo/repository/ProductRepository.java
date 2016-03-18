@@ -1,5 +1,7 @@
 package demo.repository;
 
+import java.util.Map;
+
 import demo.model.Product;
 
 public interface ProductRepository {
@@ -12,6 +14,8 @@ public interface ProductRepository {
 	
 	Iterable<Product> findAllOrderedKeysFirstApproach();
 	
+	Map<String, Product> findAllByCodes(Iterable<String> codes);
+
 	Product findOne(String sku);
 
 	Product save(Product product);

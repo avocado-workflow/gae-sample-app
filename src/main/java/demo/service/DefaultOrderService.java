@@ -1,7 +1,10 @@
 package demo.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -55,12 +58,18 @@ public class DefaultOrderService implements OrderService {
 	// TODO : move to separate validator.
 	private void validateOrder(Order order) {
 		List<OrderItem> orderItems = order.getOrderItems();
+		
+
+		List<String> productCodes = new ArrayList<>();
+		for (OrderItem orderItem : orderItems) {
+			productCodes.add(orderItem.getProduct().getCode());
+		}
+		
+		Map<String, Product> allOrderProducts = productRepository.findAllByCodes(productCodes);
+		
 		for (OrderItem orderItem : orderItems) {
 			double orderPrice = orderItem.getPrice();
-			// FIXME : performance degradation here. Loop over all orderItems to
-			// get all product keys and then issue getAllproducts instead of
-			// getting them one by one as it is now.
-			Product product = productRepository.findOne(orderItem.getProduct().getCode());
+			Product product = allOrderProducts.get(orderItem.getProduct().getCode());
 			if (product == null) {
 				throw new RequestValidationException("Specified product: " + orderItem.getProduct().getCode() + " doesn't exist");
 			}

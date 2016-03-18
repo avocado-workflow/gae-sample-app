@@ -1,5 +1,6 @@
 package demo.repository;
 
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -64,5 +65,10 @@ public class GoogleDatastoreProductRepository implements ProductRepository {
 	@Override
 	public void update(Product product) {
 		cache.put(product.getCode(), product);
+	}
+
+	@Override
+	public Map<String, Product> findAllByCodes(Iterable<String> codes) {
+		return cache.getAllByCodes(codes);
 	}
 }

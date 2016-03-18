@@ -40,7 +40,7 @@
 
 	<filter-mapping>
 		<filter-name>appstats</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/products/*</url-pattern>
 	</filter-mapping>
 <!-- 
 	<filter>

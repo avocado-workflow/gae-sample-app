@@ -87,12 +87,12 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	@Test
 	public void testOrderCreation() throws Exception {
 		
-		int NUM_OF_ORDERS_TO_CREATE = 1;
+		int NUM_OF_ORDERS_TO_CREATE = 2000;
 		ResponseEntity<Product[]> responseEntity = testRestTemplate.getForEntity(baseUrl + "/products", Product[].class);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Product[] products = responseEntity.getBody();
 		
-		int NUM_OF_PRODUCTS_TO_USE = 10000 > products.length ? products.length : 10000;
+		int NUM_OF_PRODUCTS_TO_USE = 1000 > products.length ? products.length : 1000;
 		System.out.println("PRODUCTS USED: " + NUM_OF_PRODUCTS_TO_USE);
 		final Queue<Order> ordersQueue = new ConcurrentLinkedQueue<Order>();
 
@@ -101,8 +101,8 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 	
 			Address address = new Address();
 			address.setLine1("address #" + i);
-			address.setLine2("NY, USA");
-			address.setZipCode("Mar-17");
+			address.setLine2("8k batch creation NY, USA");
+			address.setZipCode("Mar-18");
 			order.setAddress(address);
 
 			Product productToOrder = products[i%NUM_OF_PRODUCTS_TO_USE];
@@ -157,8 +157,8 @@ public class OrderCreationLoadTest extends BaseIntegrationTest {
 		
 		Address address = new Address();
 		address.setLine1("address #BIG" );
-		address.setLine2("2k items ORDER");
-		address.setZipCode("2000");
+		address.setLine2("10k items ORDER");
+		address.setZipCode("10000");
 		order.setAddress(address);
 		List<OrderItem> orderItems = new ArrayList<>();
 		

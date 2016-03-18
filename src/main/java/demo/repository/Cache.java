@@ -1,6 +1,7 @@
 package demo.repository;
 
 import java.util.Collection;
+import java.util.Map;
 
 public interface Cache<T> {
 
@@ -17,4 +18,6 @@ public interface Cache<T> {
 	void remove(String key);
 
 	<C extends Comparable<C>> Collection<C> getAllOrderedKeysFirstApproach(Class<C> type);
+
+	Map<String, T> getAllByCodes(Iterable<String> codes);
 }

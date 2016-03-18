@@ -1,11 +1,13 @@
 package demo.repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -49,188 +51,188 @@ public class BasicCacheImpl<T> implements Cache<T> {
 
 	@Override
 	public Collection<T> getAllUnordered() {
-//		Object cachedValue = cache.get(keysForAllRegistry.get(type));
-//		if (cachedValue == null) {
+		// Object cachedValue = cache.get(keysForAllRegistry.get(type));
+		// if (cachedValue == null) {
 
-			ObjectifyService.ofy().clear();
+		ObjectifyService.ofy().clear();
 
-			Measurement m = new Measurement("BasicCacheImpl", "getAllUnordered");
-			List<T> entitiesFromDatastore = ObjectifyService.ofy().cache(false).load().type(type).list();
-			profiler.submitMeasurementAsync(m);
+		Measurement m = new Measurement("BasicCacheImpl", "getAllUnordered");
+		List<T> entitiesFromDatastore = ObjectifyService.ofy().cache(false).load().type(type).list();
+		profiler.submitMeasurementAsync(m);
 
-			m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
-			for (T t : entitiesFromDatastore) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
+		m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
+		for (T t : entitiesFromDatastore) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
 
-			m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
-			for (T t : entitiesFromDatastore) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
+		m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
+		for (T t : entitiesFromDatastore) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
 
-//			m = new Measurement("BasicCacheImpl", "putInMemcache");
-//			cache.put(keysForAllRegistry.get(type), entitiesFromDatastore);
-//			profiler.submitMeasurementAsync(m);
+		// m = new Measurement("BasicCacheImpl", "putInMemcache");
+		// cache.put(keysForAllRegistry.get(type), entitiesFromDatastore);
+		// profiler.submitMeasurementAsync(m);
 
-			return entitiesFromDatastore;
-//		} else {
-//			return (Collection<T>) cachedValue;
-//		}
+		return entitiesFromDatastore;
+		// } else {
+		// return (Collection<T>) cachedValue;
+		// }
 	}
 
 	@Override
 	public Collection<T> getAllOrdered() {
-//		Object cachedValue = cache.get(keysForAllRegistry.get(type));
-//		if (cachedValue == null) {
+		// Object cachedValue = cache.get(keysForAllRegistry.get(type));
+		// if (cachedValue == null) {
 
-			ObjectifyService.ofy().clear();
+		ObjectifyService.ofy().clear();
 
-			Measurement m = new Measurement("BasicCacheImpl", "getAllOrdered");
-			List<T> entitiesFromDatastore = ObjectifyService.ofy().cache(false).load().type(type).order("-sortOrder").order("name").list();
-			profiler.submitMeasurementAsync(m);
+		Measurement m = new Measurement("BasicCacheImpl", "getAllOrdered");
+		List<T> entitiesFromDatastore = ObjectifyService.ofy().cache(false).load().type(type).order("-sortOrder").order("name").list();
+		profiler.submitMeasurementAsync(m);
 
-			m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
-			for (T t : entitiesFromDatastore) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
+		m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
+		for (T t : entitiesFromDatastore) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
 
-			m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
-			for (T t : entitiesFromDatastore) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
+		m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
+		for (T t : entitiesFromDatastore) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
 
-//			m = new Measurement("BasicCacheImpl", "putInMemcache");
-//			cache.put(keysForAllRegistry.get(type), entitiesFromDatastore);
-//			profiler.submitMeasurementAsync(m);
+		// m = new Measurement("BasicCacheImpl", "putInMemcache");
+		// cache.put(keysForAllRegistry.get(type), entitiesFromDatastore);
+		// profiler.submitMeasurementAsync(m);
 
-			return entitiesFromDatastore;
-//		} else {
-//			return (Collection<T>) cachedValue;
-//		}
+		return entitiesFromDatastore;
+		// } else {
+		// return (Collection<T>) cachedValue;
+		// }
 	}
 
 	@Override
 	public Collection<T> getAllUnorderedKeysFirstApproach() {
-//		Object cachedValue = cache.get(keysForAllRegistry.get(type));
-//		if (cachedValue == null) {
-	
-			ObjectifyService.ofy().clear();
-	
-			Measurement m = new Measurement("BasicCacheImpl", "getAllKeysOnly");
-			List<Key<T>> keys = ObjectifyService.ofy().cache(false).load().type(type).keys().list();
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "loopingOverKeys1");
-			for (Key<T> key : keys) {
-				key.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-			
-			m = new Measurement("BasicCacheImpl", "loopingOverKeys2");
-			for (Key<T> key : keys) {
-				key.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-			
-			ObjectifyService.ofy().clear();
-	
-			m = new Measurement("BasicCacheImpl", "getAllByKeys");
-			Map<Key<T>, T> entitiesMap = ObjectifyService.ofy().cache(false).load().keys(keys);
-			profiler.submitMeasurementAsync(m);
-			
-			Collection<T> entities = null;
-			
-			m = new Measurement("BasicCacheImpl", "getValuesFromMap1");
-			entities = entitiesMap.values();
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "getValuesFromMap2");
-			entities = entitiesMap.values();
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
-			for(T t : entities) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
-			for(T t : entities) {
-				t.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-	
-//			m = new Measurement("BasicCacheImpl", "putInMemcache");
-//			List<T> entitiesList = new LinkedList<T>(entities);
-//			cache.put(keysForAllRegistry.get(type), entitiesList);
-//			profiler.submitMeasurementAsync(m);
-	
-			return entities;
-//		} else {
-//			return (Collection<T>) cachedValue;
-//		}
+		// Object cachedValue = cache.get(keysForAllRegistry.get(type));
+		// if (cachedValue == null) {
+
+		ObjectifyService.ofy().clear();
+
+		Measurement m = new Measurement("BasicCacheImpl", "getAllKeysOnly");
+		List<Key<T>> keys = ObjectifyService.ofy().cache(false).load().type(type).keys().list();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingOverKeys1");
+		for (Key<T> key : keys) {
+			key.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingOverKeys2");
+		for (Key<T> key : keys) {
+			key.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		ObjectifyService.ofy().clear();
+
+		m = new Measurement("BasicCacheImpl", "getAllByKeys");
+		Map<Key<T>, T> entitiesMap = ObjectifyService.ofy().cache(false).load().keys(keys);
+		profiler.submitMeasurementAsync(m);
+
+		Collection<T> entities = null;
+
+		m = new Measurement("BasicCacheImpl", "getValuesFromMap1");
+		entities = entitiesMap.values();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "getValuesFromMap2");
+		entities = entitiesMap.values();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingToMaterialize");
+		for (T t : entities) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingOverMaterialized");
+		for (T t : entities) {
+			t.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		// m = new Measurement("BasicCacheImpl", "putInMemcache");
+		// List<T> entitiesList = new LinkedList<T>(entities);
+		// cache.put(keysForAllRegistry.get(type), entitiesList);
+		// profiler.submitMeasurementAsync(m);
+
+		return entities;
+		// } else {
+		// return (Collection<T>) cachedValue;
+		// }
 	}
 
 	@Override
 	public <C extends Comparable<C>> Collection<C> getAllOrderedKeysFirstApproach(Class<C> type) {
-	
-//		Object cachedValue = cache.get(keysForAllRegistry.get(type));
-//		if (cachedValue == null) {
-//	
-			ObjectifyService.ofy().clear();
-	
-			Measurement m = new Measurement("BasicCacheImpl", "getAllKeysOnly");
-			List<Key<C>> keys = ObjectifyService.ofy().cache(false).load().type(type).keys().list();
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "loopingOverKeys1");
-			for (Key<C> key : keys) {
-				key.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-			
-			m = new Measurement("BasicCacheImpl", "loopingOverKeys2");
-			for (Key<C> key : keys) {
-				key.hashCode();
-			}
-			profiler.submitMeasurementAsync(m);
-			
-			ObjectifyService.ofy().clear();
-			
-			m = new Measurement("BasicCacheImpl", "getAllByKeys");
-			Map<Key<C>, C> entitiesMap = ObjectifyService.ofy().cache(false).load().keys(keys);
-			profiler.submitMeasurementAsync(m);
 
-			Collection<C> entities = null;
-			
-			m = new Measurement("BasicCacheImpl", "getValuesFromMap1");
-			entities = entitiesMap.values();
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "getValuesFromMap2");
-			entities = entitiesMap.values();
-			profiler.submitMeasurementAsync(m);
-			
-			m = new Measurement("BasicCacheImpl", "convertingToList");
-			LinkedList<C> entitiesList = new LinkedList<C>(entities);
-			profiler.submitMeasurementAsync(m);
-	
-			m = new Measurement("BasicCacheImpl", "sortingAllByKeys");
-			Collections.sort(entitiesList);
-			profiler.submitMeasurementAsync(m);
-	
-//			m = new Measurement("BasicCacheImpl", "putInMemcache");
-//			cache.put(keysForAllRegistry.get(type), entitiesList);
-//			profiler.submitMeasurementAsync(m);
+		// Object cachedValue = cache.get(keysForAllRegistry.get(type));
+		// if (cachedValue == null) {
+		//
+		ObjectifyService.ofy().clear();
 
-			return entitiesList;
-//		} else {
-//			return (Collection<C>) cachedValue;
-//		}
+		Measurement m = new Measurement("BasicCacheImpl", "getAllKeysOnly");
+		List<Key<C>> keys = ObjectifyService.ofy().cache(false).load().type(type).keys().list();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingOverKeys1");
+		for (Key<C> key : keys) {
+			key.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "loopingOverKeys2");
+		for (Key<C> key : keys) {
+			key.hashCode();
+		}
+		profiler.submitMeasurementAsync(m);
+
+		ObjectifyService.ofy().clear();
+
+		m = new Measurement("BasicCacheImpl", "getAllByKeys");
+		Map<Key<C>, C> entitiesMap = ObjectifyService.ofy().cache(false).load().keys(keys);
+		profiler.submitMeasurementAsync(m);
+
+		Collection<C> entities = null;
+
+		m = new Measurement("BasicCacheImpl", "getValuesFromMap1");
+		entities = entitiesMap.values();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "getValuesFromMap2");
+		entities = entitiesMap.values();
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "convertingToList");
+		LinkedList<C> entitiesList = new LinkedList<C>(entities);
+		profiler.submitMeasurementAsync(m);
+
+		m = new Measurement("BasicCacheImpl", "sortingAllByKeys");
+		Collections.sort(entitiesList);
+		profiler.submitMeasurementAsync(m);
+
+		// m = new Measurement("BasicCacheImpl", "putInMemcache");
+		// cache.put(keysForAllRegistry.get(type), entitiesList);
+		// profiler.submitMeasurementAsync(m);
+
+		return entitiesList;
+		// } else {
+		// return (Collection<C>) cachedValue;
+		// }
 	}
 
 	@Override
@@ -250,5 +252,24 @@ public class BasicCacheImpl<T> implements Cache<T> {
 		ObjectifyService.ofy().delete().type(type).id(key).now();
 		cache.delete(key);
 		cache.delete(keysForAllRegistry.get(type));
+	}
+
+	@Override
+	public Map<String, T> getAllByCodes(Iterable<String> codes) {
+		ObjectifyService.ofy().clear();
+
+		List<Key<T>> keys = new ArrayList<>();
+		for (String code : codes) {
+			keys.add(Key.create(type, code));
+		}
+
+		Map<Key<T>, T> entitiesMap = ObjectifyService.ofy().cache(false).load().keys(keys);
+
+		Map<String, T> entitiesToReturn = new HashMap<>();
+		for (Entry<Key<T>, T> entry : entitiesMap.entrySet()) {
+			entitiesToReturn.put(entry.getKey().getName(), entry.getValue());
+		}
+		
+		return entitiesToReturn;
 	}
 }
